@@ -79,3 +79,7 @@ const zxBasicKeywords = [
     { label: 'SUB', kind: CompletionItemKind.Keyword, detail: 'Define un procedimiento' },
     { label: 'FUNCTION', kind: CompletionItemKind.Keyword, detail: 'Define una función' },
 ];
+
+module.exports = {
+    zxBasicKeywords
+};
