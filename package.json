@@ -1,4 +1,18 @@
 {
+  "name": "zx-basic-lsp",
+  "version": "1.0.0",
+  "description": "ZX Basic Language Server Protocol (LSP) implementation for enhanced development experience in Visual Studio Code.",
+  "author": "Raül Torralba (Juntelart)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rtorralba/zx-basic-lsp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rtorralba/zx-basic-lsp/issues"
+  },
+  "homepage": "https://github.com/rtorralba/zx-basic-lsp#readme",
+  "main": "main.js",
   "dependencies": {
     "chokidar": "^4.0.3",
     "glob": "^11.0.1",
