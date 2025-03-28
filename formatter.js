@@ -8,8 +8,7 @@ function formatZXBasicCode(document) {
     const lines = text.split(/\r?\n/);
     const edits = [];
     let indentLevel = 0;
-    const indentSize = 4; // Tamaño de la indentación (4 espacios)
-
+    const indentSize = 2; // Tamaño de la indentación (2 espacios)
 
     lines.forEach((line, i) => {
         const trimmedLine = line.trim();
@@ -19,6 +18,19 @@ function formatZXBasicCode(document) {
         // Reducir nivel de indentación para palabras clave de cierre
         if (/^\s*(END SUB|END FUNCTION|END IF|NEXT|WEND|LOOP|END ASM|#ENDIF)\b/i.test(trimmedLine)) {
             indentLevel = Math.max(0, indentLevel - 1);
+        }
+
+        // Manejar bloques ELSE y ELSEIF
+        if (/^\s*(ELSE|ELSEIF\b.*)\b/i.test(trimmedLine)) {
+            // Asegurarse de que estén alineados con el bloque IF correspondiente
+            const elseExpectedIndent = ' '.repeat(Math.max(0, (indentLevel - 1) * indentSize));
+            if (!line.startsWith(elseExpectedIndent) || line !== elseExpectedIndent + trimmedLine) {
+                edits.push(TextEdit.replace(
+                    Range.create(i, 0, i, line.length),
+                    elseExpectedIndent + trimmedLine
+                ));
+            }
+            return; // No procesar más para ELSE/ELSEIF
         }
 
         // Calcular la indentación esperada
@@ -32,7 +44,7 @@ function formatZXBasicCode(document) {
         }
 
         // Aumentar nivel de indentación para palabras clave de apertura
-        if (/^\s*(SUB|FUNCTION|IF|FOR|WHILE|DO|ASM#IF)\b/i.test(trimmedLine)) {
+        if (/^\s*(SUB|FUNCTION|IF|FOR|WHILE|DO|ASM|#IF)\b/i.test(trimmedLine)) {
             indentLevel++;
         }
     });

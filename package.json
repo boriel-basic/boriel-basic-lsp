@@ -1,7 +1,7 @@
 {
   "name": "zx-basic-lsp",
   "version": "1.0.1",
-  "description": "ZX Basic Language Server Protocol (LSP) implementation for enhanced development experience in Visual Studio Code.",
+  "description": "ZX Basic Language Server Protocol (LSP) implementation for enhanced development",
   "author": "Raül Torralba (Juntelart)",
   "license": "MIT",
   "repository": {

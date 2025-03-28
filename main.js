@@ -1,7 +1,5 @@
 const {
     createConnection,
-    Diagnostic,
-    DiagnosticSeverity,
     Range,
     TextDocuments,
     TextDocumentSyncKind,
@@ -107,11 +105,11 @@ const { validateZXBasic } = require('./validator');
 
 // Validar documentos al abrir o cambiar contenido
 documents.onDidOpen((event) => {
-    validateZXBasic(event.document);
+    validateZXBasic(event.document, connection);
 });
 
 documents.onDidChangeContent((event) => {
-    validateZXBasic(event.document);
+    validateZXBasic(event.document, connection);
 });
 
 // Proveer autocompletado
