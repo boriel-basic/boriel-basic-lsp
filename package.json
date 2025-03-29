@@ -6,12 +6,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rtorralba/zx-basic-lsp.git"
+    "url": "https://github.com/boriel-basic/zx-basic-lsp.git"
   },
   "bugs": {
-    "url": "https://github.com/rtorralba/zx-basic-lsp/issues"
+    "url": "https://github.com/boriel-basic/zx-basic-lsp/issues"
   },
-  "homepage": "https://github.com/rtorralba/zx-basic-lsp#readme",
+  "homepage": "https://github.com/boriel-basic/zx-basic-lsp#readme",
   "main": "main.js",
   "bin": "./main.js",
   "dependencies": {
