@@ -1,6 +1,6 @@
 {
   "name": "zx-basic-lsp",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "ZX Basic Language Server Protocol (LSP) implementation for enhanced development",
   "author": "Raül Torralba (Juntelart)",
   "license": "MIT",
@@ -13,6 +13,7 @@
   },
   "homepage": "https://github.com/rtorralba/zx-basic-lsp#readme",
   "main": "main.js",
+  "bin": "./main.js",
   "dependencies": {
     "chokidar": "^4.0.3",
     "glob": "^11.0.1",
