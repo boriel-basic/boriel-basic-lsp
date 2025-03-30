@@ -44,11 +44,13 @@ function formatZXBasicCode(document) {
         }
 
         // Aumentar nivel de indentación para palabras clave de apertura
-        if (/^\s*(SUB|FUNCTION|IF|FOR|WHILE|DO|ASM|#IF)\b/i.test(trimmedLine)) {
-            // Mirar si la linea no contiene THEN con instring
-            if (!/THEN/i.test(trimmedLine)) {
-                indentLevel++;
-            }
+        if (/^\s*(SUB|FUNCTION|IF|FOR|WHILE|DO|ASM|#IFDEF)\b/i.test(trimmedLine)) {
+            // Mirar si la linea contiene THEN con instring continuar el bucle
+            if (/THEN/i.test(trimmedLine)) return
+            // Mirar si la linea contiene :
+            if (trimmedLine.includes(':WEND')) return
+
+            indentLevel++;
         }
     });
 
