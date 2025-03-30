@@ -8,7 +8,7 @@ function formatZXBasicCode(document) {
     const lines = text.split(/\r?\n/);
     const edits = [];
     let indentLevel = 0;
-    const indentSize = 2; // Tamaño de la indentación (2 espacios)
+    const indentSize = 4; // Tamaño de la indentación (2 espacios)
 
     lines.forEach((line, i) => {
         const trimmedLine = line.trim();
