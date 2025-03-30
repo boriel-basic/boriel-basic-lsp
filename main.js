@@ -21,7 +21,14 @@ documents.listen(connection);
 
 const { zxBasicKeywords } = require('./const');
 const { formatZXBasicCode } = require('./formatter');
-const { globalDefinitions, globalReferences, analyzeProjectFiles } = require('./analyzer');
+const { 
+    globalDefinitions, 
+    globalReferences, 
+    globalVariables,
+    analyzeProjectFiles, 
+    analyzeFileForDefinitions, 
+    analyzeFileForReferences,
+} = require('./analyzer');
 
 // Manejar el evento de formato de documentos
 connection.onDocumentFormatting((params) => {
@@ -36,6 +43,7 @@ connection.onDocumentFormatting((params) => {
 
 // Manejar solicitud de definición
 connection.onDefinition((params) => {
+    console.log("globalVariables: ", globalVariables);
     const document = documents.get(params.textDocument.uri);
     const position = params.position;
 
@@ -58,14 +66,26 @@ connection.onDefinition((params) => {
         return null;
     }
 
-    // Normalizar la palabra eliminando paréntesis y parámetros
-    wordAtPosition = wordAtPosition.replace(/\(.*\)$/, '');
-    console.log(`Buscando definición para: ${wordAtPosition}`);
+    // if wordAtPosition is a function or subroutine
+    if (wordAtPosition.includes('(')) {
+        wordAtPosition = wordAtPosition.split('(')[0].trim();
+        console.log(`Buscando definición para: ${wordAtPosition}`);
+        // Normalizar la palabra eliminando paréntesis y parámetros
+        wordAtPosition = wordAtPosition.split('(')[0].trim();
+        console.log(`Buscando definición para: ${wordAtPosition}`);
 
-    // Buscar la definición en globalDefinitions
-    if (globalDefinitions.has(wordAtPosition)) {
-        const location = globalDefinitions.get(wordAtPosition);
-        console.log(`Definición encontrada para ${wordAtPosition}:`, location);
+        // Buscar en definiciones de funciones
+        if (globalDefinitions.has(wordAtPosition)) {
+            const location = globalDefinitions.get(wordAtPosition);
+            console.log(`Definición de función encontrada para ${wordAtPosition}:`, location);
+            return location;
+        }
+    }
+
+    // Buscar en definiciones de variables
+    if (globalVariables.has(wordAtPosition)) {
+        const location = globalVariables.get(wordAtPosition);
+        console.log(`Definición de variable encontrada para ${wordAtPosition}:`, location);
         return location;
     }
 
@@ -105,7 +125,8 @@ connection.onInitialize(() => {
         capabilities: {
             textDocumentSync: {
                 openClose: true,
-                change: TextDocumentSyncKind.Incremental
+                change: TextDocumentSyncKind.Incremental,
+                save: { includeText: true } // Habilitar eventos de guardado
             },
             completionProvider: {
                 resolveProvider: true // Permite resolver detalles adicionales de los ítems
@@ -129,6 +150,21 @@ documents.onDidOpen((event) => {
 
 documents.onDidChangeContent((event) => {
     validateZXBasic(event.document, connection);
+});
+
+// Manejar el evento de guardar un documento
+documents.onDidSave((event) => {
+    const document = event.document;
+    const uri = document.uri;
+    const filePath = uri.replace('file://', '');
+
+    console.log(`Archivo guardado: ${filePath}. Reanalizando definiciones y referencias...`);
+
+    // Volver a analizar el archivo para encontrar definiciones y referencias
+    analyzeFileForDefinitions(filePath, uri);
+    analyzeFileForReferences(filePath, uri);
+
+    console.log(`Análisis completado para el archivo guardado: ${filePath}`);
 });
 
 // Proveer autocompletado

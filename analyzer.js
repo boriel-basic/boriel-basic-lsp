@@ -7,6 +7,7 @@ const ignore = require('ignore');
 // Índices para definiciones y referencias
 const globalDefinitions = new Map(); // { nombre: Location }
 const globalReferences = new Map(); // { nombre: [Location, ...] }
+const globalVariables = new Map(); // { nombre: Location }
 
 // Obtener la ruta del proyecto desde los argumentos
 const projectPath = process.argv[2]; // La ruta del proyecto se pasa como argumento al servidor
@@ -52,12 +53,6 @@ function analyzeProjectFiles() {
         const uri = `file://${file}`;
         console.log(`Analizando definiciones en archivo: ${file}`);
         analyzeFileForDefinitions(file, uri);
-    });
-
-    // Segundo pase: analizar referencias
-    filteredFiles.forEach((file) => {
-        const uri = `file://${file}`;
-        console.log(`Analizando referencias en archivo: ${file}`);
         analyzeFileForReferences(file, uri);
     });
 
@@ -93,6 +88,15 @@ function analyzeFileForDefinitions(filePath, uri) {
 
             // Almacenar el nombre normalizado (sin parámetros ni FASTCALL)
             globalDefinitions.set(name, Location.create(uri, Range.create(i, 0, i, trimmedLine.length)));
+        }
+
+        // Detectar definiciones de variables con DIM
+        const variableMatch = /^\s*DIM\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:AS\s+\w+)?\s*=/i.exec(trimmedLine);        if (variableMatch) {
+            const name = variableMatch[1]; // Nombre de la variable
+            console.log(`Definición de variable encontrada: DIM ${name} en ${filePath}, línea ${i + 1}`);
+
+            // Almacenar la definición de la variable
+            globalVariables.set(name, Location.create(uri, Range.create(i, 0, i, trimmedLine.length)));
         }
     });
 }
@@ -134,6 +138,9 @@ function analyzeFileForReferences(filePath, uri) {
 
 module.exports = {
     analyzeProjectFiles,
+    analyzeFileForDefinitions,
+    analyzeFileForReferences,
     globalDefinitions,
-    globalReferences
+    globalReferences,
+    globalVariables,
 };

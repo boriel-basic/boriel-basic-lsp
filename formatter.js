@@ -46,9 +46,9 @@ function formatZXBasicCode(document) {
         // Aumentar nivel de indentación para palabras clave de apertura
         if (/^\s*(SUB|FUNCTION|IF|FOR|WHILE|DO|ASM|#IFDEF)\b/i.test(trimmedLine)) {
             // Mirar si la linea contiene THEN con instring continuar el bucle
-            if (/THEN/i.test(trimmedLine)) return
+            if (/THEN\n/i.test(trimmedLine)) return
             // Mirar si la linea contiene :
-            if (trimmedLine.includes(':WEND')) return
+            if (trimmedLine.includes(':WEND\n')) return
 
             indentLevel++;
         }
