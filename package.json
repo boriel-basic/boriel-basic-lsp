@@ -1,6 +1,6 @@
 {
   "name": "zx-basic-lsp",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "ZX Basic Language Server Protocol (LSP) implementation for enhanced development",
   "author": "Raül Torralba (Juntelart)",
   "license": "MIT",
