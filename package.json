@@ -1,6 +1,6 @@
 {
   "name": "zx-basic-lsp",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "ZX Basic Language Server Protocol (LSP) implementation for enhanced development",
   "author": "Raül Torralba (Juntelart)",
   "license": "MIT",
@@ -17,6 +17,7 @@
   "dependencies": {
     "chokidar": "^4.0.3",
     "glob": "^11.0.1",
+    "ignore": "^7.0.3",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.12"
   }

@@ -36,23 +36,40 @@ connection.onDocumentFormatting((params) => {
 
 // Manejar solicitud de definición
 connection.onDefinition((params) => {
-    const position = params.position;
     const document = documents.get(params.textDocument.uri);
-    if (!document) {
+    const position = params.position;
+
+    // Obtener la línea de texto en la posición actual
+    const lineText = document.getText({
+        start: { line: position.line, character: 0 },
+        end: { line: position.line, character: Number.MAX_SAFE_INTEGER }
+    });
+
+    // Extraer la palabra en la posición actual
+    const words = lineText.trim().split(/\s+/);
+    let wordAtPosition = words.find((word) => {
+        const startIndex = lineText.indexOf(word);
+        const endIndex = startIndex + word.length;
+        return position.character >= startIndex && position.character <= endIndex;
+    });
+
+    if (!wordAtPosition) {
+        console.log('No se encontró ninguna palabra en la posición actual.');
         return null;
     }
 
-    const lineText = document.getText(Range.create(position.line, 0, position.line, document.getText().length));
-    const words = lineText.trim().split(/\s+/).map(word => word.replace(/[^\w]/g, ''));
+    // Normalizar la palabra eliminando paréntesis y parámetros
+    wordAtPosition = wordAtPosition.replace(/\(.*\)$/, '');
+    console.log(`Buscando definición para: ${wordAtPosition}`);
 
-    for (const word of words) {
-        if (globalDefinitions.has(word)) {
-            console.log(`Definición global encontrada para: ${word}`);
-            return globalDefinitions.get(word);
-        }
+    // Buscar la definición en globalDefinitions
+    if (globalDefinitions.has(wordAtPosition)) {
+        const location = globalDefinitions.get(wordAtPosition);
+        console.log(`Definición encontrada para ${wordAtPosition}:`, location);
+        return location;
     }
 
-    console.log('No se encontró definición global');
+    console.log(`No se encontró definición para: ${wordAtPosition}`);
     return null;
 });
 
