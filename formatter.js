@@ -3,7 +3,7 @@ const {
     TextEdit,
 } = require('vscode-languageserver/node');
 
-function formatZXBasicCode(document) {
+function formatBorielBasicCode(document) {
     const text = document.getText();
     const lines = text.split(/\r?\n/);
     const edits = [];
@@ -60,5 +60,5 @@ function formatZXBasicCode(document) {
 }
 
 module.exports = {
-    formatZXBasicCode
+    formatBorielBasicCode
 };

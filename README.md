@@ -1,3 +1,3 @@
-## LSP de ZX Basic Boriel
+## LSP de Boriel Basic
 
-[ZX Basic](https://github.com/boriel-basic/zxbasic)
+[Boriel Basic](https://github.com/boriel-basic/BorielBasic)

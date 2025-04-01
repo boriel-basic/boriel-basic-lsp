@@ -4,15 +4,15 @@ const {
 } = require('vscode-languageserver/node');
 
 const { globalVariables, globalDefinitions } = require('./analyzer');
-const { zxBasicKeywords } = require('./const');
+const { borielBasicKeywords } = require('./const');
 
-// Función para validar documentos ZX Basic
-function validateZXBasic(document, connection) {
+// Función para validar documentos Boriel Basic
+function validateBorielBasic(document, connection) {
     console.log('Validando documento:', document.uri);
     console.log('globalVariables:', globalVariables);
 
-    // Extraer de todos los elemenos de zxBasicKeywords la propiedad label
-    const keywordLabels = Object.keys(zxBasicKeywords).map((key) => zxBasicKeywords[key].label);
+    // Extraer de todos los elemenos de borielBasicKeywords la propiedad label
+    const keywordLabels = Object.keys(borielBasicKeywords).map((key) => borielBasicKeywords[key].label);
     console.log('Palabras clave:', keywordLabels);
 
     const text = document.getText();
@@ -43,54 +43,54 @@ function validateZXBasic(document, connection) {
             });
         }
 
-        // Detectar uso de variables no definidas
-        const variableRegex = /[a-zA-Z_]\w*\(|[a-zA-Z_]\w*|"[^"]*"/g;
-        const variables = trimmedLine.match(variableRegex);
-        if (variables) {
-            variables.forEach((variable) => {
-                console.log('Variable encontrada:', variable);
+        // // Detectar uso de variables no definidas
+        // const variableRegex = /[a-zA-Z_]\w*\(|[a-zA-Z_]\w*|"[^"]*"/g;
+        // const variables = trimmedLine.match(variableRegex);
+        // if (variables) {
+        //     variables.forEach((variable) => {
+        //         console.log('Variable encontrada:', variable);
 
-                if (variable.includes('(')) {
-                    return; // Ignorar funciones o subrutinas
-                }
+        //         if (variable.includes('(')) {
+        //             return; // Ignorar funciones o subrutinas
+        //         }
 
-                if (variable.includes('"')) {
-                    return; // Ignorar variables de cadena
-                }
+        //         if (variable.includes('"')) {
+        //             return; // Ignorar variables de cadena
+        //         }
 
-                const normalizedVariable = variable.trim().toUpperCase();
+        //         const normalizedVariable = variable.trim().toUpperCase();
 
-                if (keywordLabels.includes(normalizedVariable)) {
-                    return;
-                }
-                if (!globalVariables.has(variable)) { // Cambiado de includes a has
-                    diagnostics.push({
-                        range: Range.create(i, trimmedLine.indexOf(variable), i, trimmedLine.indexOf(variable) + variable.length),
-                        message: `La variable "${variable}" no está definida.`,
-                        severity: DiagnosticSeverity.Error
-                    });
-                }
-            });
-        }
+        //         if (keywordLabels.includes(normalizedVariable)) {
+        //             return;
+        //         }
+        //         if (!globalVariables.has(variable)) { // Cambiado de includes a has
+        //             diagnostics.push({
+        //                 range: Range.create(i, trimmedLine.indexOf(variable), i, trimmedLine.indexOf(variable) + variable.length),
+        //                 message: `La variable "${variable}" no está definida.`,
+        //                 severity: DiagnosticSeverity.Error
+        //             });
+        //         }
+        //     });
+        // }
 
-        // Detectar uso de funciones no definidas
-        const functionRegex = /\b[a-zA-Z_]\w*\s*\(/g;
-        const functions = trimmedLine.match(functionRegex);
-        if (functions) {
-            functions.forEach((func) => {
-                const functionName = func.split('(')[0].trim();
-                if (keywordLabels.includes(functionName)) {
-                    return;
-                }
-                if (!globalDefinitions.has(functionName)) {
-                    diagnostics.push({
-                        range: Range.create(i, trimmedLine.indexOf(func), i, trimmedLine.indexOf(func) + func.length),
-                        message: `La función "${functionName}" no está definida.`,
-                        severity: DiagnosticSeverity.Error
-                    });
-                }
-            });
-        }
+        // // Detectar uso de funciones no definidas
+        // const functionRegex = /\b[a-zA-Z_]\w*\s*\(/g;
+        // const functions = trimmedLine.match(functionRegex);
+        // if (functions) {
+        //     functions.forEach((func) => {
+        //         const functionName = func.split('(')[0].trim();
+        //         if (keywordLabels.includes(functionName)) {
+        //             return;
+        //         }
+        //         if (!globalDefinitions.has(functionName)) {
+        //             diagnostics.push({
+        //                 range: Range.create(i, trimmedLine.indexOf(func), i, trimmedLine.indexOf(func) + func.length),
+        //                 message: `La función "${functionName}" no está definida.`,
+        //                 severity: DiagnosticSeverity.Error
+        //             });
+        //         }
+        //     });
+        // }
 
         // Detectar apertura de bloques IF
         if (/^\s*if\s+.+\s+then\s*$/i.test(trimmedLine)) {
@@ -121,5 +121,5 @@ function validateZXBasic(document, connection) {
 }
 
 module.exports = {
-    validateZXBasic
+    validateBorielBasic
 };

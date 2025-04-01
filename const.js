@@ -2,8 +2,8 @@ const {
     CompletionItemKind,
 } = require('vscode-languageserver/node');
 
-// Palabras clave de ZX Basic para autocompletado
-const zxBasicKeywords = [
+// Palabras clave de Boriel Basic para autocompletado
+const borielBasicKeywords = [
     // Control de flujo
     { label: 'IF', kind: CompletionItemKind.Keyword, detail: 'Estructura condicional' },
     { label: 'THEN', kind: CompletionItemKind.Keyword, detail: 'Parte de la estructura IF' },
@@ -67,7 +67,7 @@ const zxBasicKeywords = [
     { label: 'RESTORE', kind: CompletionItemKind.Keyword, detail: 'Restaura el puntero de lectura de DATA' },
     { label: 'RANDOMIZE', kind: CompletionItemKind.Keyword, detail: 'Inicializa el generador de números aleatorios' },
 
-    // Palabras clave adicionales de ZX Basic
+    // Palabras clave adicionales de Boriel Basic
     { label: 'BEEP', kind: CompletionItemKind.Keyword, detail: 'Genera un sonido' },
     { label: 'INK', kind: CompletionItemKind.Keyword, detail: 'Establece el color de la tinta' },
     { label: 'PAPER', kind: CompletionItemKind.Keyword, detail: 'Establece el color del fondo' },
@@ -102,5 +102,5 @@ const zxBasicKeywords = [
 ];
 
 module.exports = {
-    zxBasicKeywords
+    borielBasicKeywords
 };

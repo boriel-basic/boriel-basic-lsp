@@ -13,14 +13,14 @@ const { TextDocument } = require('vscode-languageserver-textdocument');
 
 // Crear conexión con el cliente
 const connection = createConnection();
-connection.console.info('ZX Basic LSP server is running');
+connection.console.info('Boriel Basic LSP server is running');
 
 // Manejo de documentos abiertos
 const documents = new TextDocuments(TextDocument);
 documents.listen(connection);
 
-const { zxBasicKeywords } = require('./const');
-const { formatZXBasicCode } = require('./formatter');
+const { borielBasicKeywords } = require('./const');
+const { formatBorielBasicCode } = require('./formatter');
 const { 
     globalDefinitions, 
     globalReferences, 
@@ -38,7 +38,7 @@ connection.onDocumentFormatting((params) => {
     }
 
     // Aplicar las reglas de formato
-    return formatZXBasicCode(document);
+    return formatBorielBasicCode(document);
 });
 
 // Manejar solicitud de definición
@@ -141,15 +141,15 @@ connection.onInitialize(() => {
 const { watchBasicFiles } = require('./watcher');
 watchBasicFiles();
 
-const { validateZXBasic } = require('./validator');
+const { validateBorielBasic } = require('./validator');
 
 // Validar documentos al abrir o cambiar contenido
 documents.onDidOpen((event) => {
-    validateZXBasic(event.document, connection);
+    validateBorielBasic(event.document, connection);
 });
 
 documents.onDidChangeContent((event) => {
-    validateZXBasic(event.document, connection);
+    validateBorielBasic(event.document, connection);
 });
 
 // Manejar el evento de guardar un documento
@@ -170,7 +170,7 @@ documents.onDidSave((event) => {
 // Proveer autocompletado
 connection.onCompletion(() => {
     // Retornar las palabras clave como sugerencias de autocompletado
-    return zxBasicKeywords;
+    return borielBasicKeywords;
 });
 
 // Resolver detalles adicionales de los ítems de autocompletado
