@@ -8,7 +8,7 @@ const zxBasicKeywords = [
     { label: 'IF', kind: CompletionItemKind.Keyword, detail: 'Estructura condicional' },
     { label: 'THEN', kind: CompletionItemKind.Keyword, detail: 'Parte de la estructura IF' },
     { label: 'ELSE', kind: CompletionItemKind.Keyword, detail: 'Parte de la estructura IF' },
-    { label: 'ENDIF', kind: CompletionItemKind.Keyword, detail: 'Finaliza una estructura IF' },
+    { label: 'END IF', kind: CompletionItemKind.Keyword, detail: 'Finaliza una estructura IF' },
     { label: 'FOR', kind: CompletionItemKind.Keyword, detail: 'Bucle FOR' },
     { label: 'TO', kind: CompletionItemKind.Keyword, detail: 'Parte de la estructura FOR' },
     { label: 'STEP', kind: CompletionItemKind.Keyword, detail: 'Incremento en un bucle FOR' },
@@ -78,6 +78,27 @@ const zxBasicKeywords = [
     { label: 'IN', kind: CompletionItemKind.Function, detail: 'Lee un valor de un puerto' },
     { label: 'SUB', kind: CompletionItemKind.Keyword, detail: 'Define un procedimiento' },
     { label: 'FUNCTION', kind: CompletionItemKind.Keyword, detail: 'Define una función' },
+
+    // Palabras clave de tipos de datos
+    { label: 'BYTE', kind: CompletionItemKind.Keyword, detail: 'Tipo de dato byte' },
+    { label: 'UBYTE', kind: CompletionItemKind.Keyword, detail: 'Tipo de dato byte sin signo' },
+    { label: 'INTEGER', kind: CompletionItemKind.Keyword, detail: 'Tipo de dato entero' },
+    { label: 'UINTEGER', kind: CompletionItemKind.Keyword, detail: 'Tipo de dato entero sin signo' },
+    { label: 'LONG', kind: CompletionItemKind.Keyword, detail: 'Tipo de dato entero largo' },
+    { label: 'ULONG', kind: CompletionItemKind.Keyword, detail: 'Tipo de dato entero largo sin signo' },
+    { label: 'STRING', kind: CompletionItemKind.Keyword, detail: 'Tipo de dato cadena' },
+    { label: 'ARRAY', kind: CompletionItemKind.Keyword, detail: 'Tipo de dato array' },
+
+    { label: 'AS', kind: CompletionItemKind.Keyword, detail: 'Especifica el tipo de dato de una variable' },
+    { label: 'FASTCALL', kind: CompletionItemKind.Keyword, detail: 'Especifica el tipo de llamada a una función' },
+    { label: 'BYVAL', kind: CompletionItemKind.Keyword, detail: 'Especifica que un parámetro se pasa por valor' },
+    { label: 'BYREF', kind: CompletionItemKind.Keyword, detail: 'Especifica que un parámetro se pasa por referencia' },
+    { label: 'OPTION', kind: CompletionItemKind.Keyword, detail: 'Especifica opciones de compilación' },
+    { label: 'BASE', kind: CompletionItemKind.Keyword, detail: 'Especifica la base numérica' },
+    { label: 'SCREEN', kind: CompletionItemKind.Keyword, detail: 'Especifica la pantalla a utilizar' },
+    { label: 'SOUND', kind: CompletionItemKind.Keyword, detail: 'Genera un sonido' },
+    { label: 'WAIT', kind: CompletionItemKind.Keyword, detail: 'Espera un evento' },
+    { label: 'CLS', kind: CompletionItemKind.Keyword, detail: 'Limpia la pantalla' },
 ];
 
 module.exports = {
