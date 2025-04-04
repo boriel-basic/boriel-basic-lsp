@@ -99,6 +99,9 @@ const borielBasicKeywords = [
     { label: 'SOUND', kind: CompletionItemKind.Keyword, detail: 'Genera un sonido' },
     { label: 'WAIT', kind: CompletionItemKind.Keyword, detail: 'Espera un evento' },
     { label: 'CLS', kind: CompletionItemKind.Keyword, detail: 'Limpia la pantalla' },
+
+    { label: 'UNTIL', kind: CompletionItemKind.Keyword, detail: 'Espera hasta que se cumpla una condición' },
+    { label: 'INKEY$', kind: CompletionItemKind.Function, detail: 'Lee una tecla presionada' },
 ];
 
 module.exports = {

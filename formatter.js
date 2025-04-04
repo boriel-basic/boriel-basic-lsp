@@ -3,15 +3,25 @@ const {
     TextEdit,
 } = require('vscode-languageserver/node');
 
-function formatBorielBasicCode(document) {
+const { borielBasicKeywords } = require('./const');
+
+function formatBorielBasicCode(document, options = { formatKeywords: false }) {
     const text = document.getText();
     const lines = text.split(/\r?\n/);
     const edits = [];
     let indentLevel = 0;
-    const indentSize = 4; // Tamaño de la indentación (2 espacios)
+    const indentSize = 4; // Tamaño de la indentación (4 espacios)
+
+    // Crear un conjunto de palabras clave en mayúsculas para comparación
+    const keywordsSet = new Set(
+        borielBasicKeywords.map(keyword =>
+            keyword.label.replace(/\\\$/g, '$').toUpperCase()
+        )
+    );
 
     lines.forEach((line, i) => {
         const trimmedLine = line.trim();
+        const originalIndent = line.slice(0, line.indexOf(trimmedLine)); // Preservar la indentación original
 
         console.log('Línea:', i, 'Indentación:', indentLevel, 'Texto:', trimmedLine);
 
@@ -22,12 +32,27 @@ function formatBorielBasicCode(document) {
 
         // Manejar bloques ELSE y ELSEIF
         if (/^\s*(ELSE|ELSEIF\b.*)\b/i.test(trimmedLine)) {
-            // Asegurarse de que estén alineados con el bloque IF correspondiente
             const elseExpectedIndent = ' '.repeat(Math.max(0, (indentLevel - 1) * indentSize));
-            if (!line.startsWith(elseExpectedIndent) || line !== elseExpectedIndent + trimmedLine) {
+            let formattedElseLine = trimmedLine;
+
+            // Convertir palabras clave a Pascal Case si la opción está habilitada
+            if (options.formatKeywords) {
+                formattedElseLine = formattedElseLine.replace(/[\w\$]+/g, (word) => {
+                    const pascalWord = keywordsSet.has(word.toUpperCase())
+                        ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                        : word;
+                    console.log(`Palabra formateada: "${word}" -> "${pascalWord}"`);
+                    return pascalWord;
+                });
+            }
+
+            const finalElseLine = elseExpectedIndent + formattedElseLine;
+
+            if (line !== finalElseLine) {
+                console.log(`Editando línea ELSE/ELSEIF: "${line}" -> "${finalElseLine}"`);
                 edits.push(TextEdit.replace(
                     Range.create(i, 0, i, line.length),
-                    elseExpectedIndent + trimmedLine
+                    finalElseLine
                 ));
             }
             return; // No procesar más para ELSE/ELSEIF
@@ -35,26 +60,37 @@ function formatBorielBasicCode(document) {
 
         // Calcular la indentación esperada
         const expectedIndent = ' '.repeat(indentLevel * indentSize);
-        if (!line.startsWith(expectedIndent) || line !== expectedIndent + trimmedLine) {
-            // Crear un cambio de texto para corregir la indentación
+        let formattedLine = trimmedLine;
+
+        // Convertir palabras clave a Pascal Case si la opción está habilitada
+        if (options.formatKeywords) {
+            formattedLine = formattedLine.replace(/[\w\$]+/g, (word) => {
+                const pascalWord = keywordsSet.has(word.toUpperCase())
+                    ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                    : word;
+                console.log(`Palabra formateada: "${word}" -> "${pascalWord}"`);
+                return pascalWord;
+            });
+        }
+
+        // Reconstruir la línea con la indentación original o esperada
+        const finalLine = expectedIndent + formattedLine;
+
+        if (line !== finalLine) {
+            // Crear un cambio de texto para corregir la línea completa
             edits.push(TextEdit.replace(
                 Range.create(i, 0, i, line.length),
-                expectedIndent + trimmedLine
+                finalLine
             ));
         }
 
         // Aumentar nivel de indentación para palabras clave de apertura
         if (/^\s*(SUB|FUNCTION|IF|FOR|WHILE|DO|ASM|#IFDEF)\b/i.test(trimmedLine)) {
-            // Mirar si la linea contiene THEN con instring continuar el bucle
-            if (/THEN\n/i.test(trimmedLine)) return
-            // Mirar si la linea contiene :
-            if (trimmedLine.includes(':WEND\n')) return
-
             indentLevel++;
         }
     });
 
-    console.log('Indentación corregida:', edits.length, 'líneas');
+    console.log('Ediciones realizadas:', edits.length);
 
     return edits;
 }

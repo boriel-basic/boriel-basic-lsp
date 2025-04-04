@@ -32,13 +32,17 @@ const {
 
 // Manejar el evento de formato de documentos
 connection.onDocumentFormatting((params) => {
+    const { formatKeywords: formatKeywords } = connection.workspaceConfig;
+
+    console.log(`Formateando documento con formatKeywords: ${formatKeywords}`);
+
     const document = documents.get(params.textDocument.uri);
     if (!document) {
         return [];
     }
 
     // Aplicar las reglas de formato
-    return formatBorielBasicCode(document);
+    return formatBorielBasicCode(document, { formatKeywords: formatKeywords });
 });
 
 // Manejar solicitud de definición
@@ -118,7 +122,18 @@ connection.onReferences((params) => {
 });
 
 // Inicialización del servidor
-connection.onInitialize(() => {
+connection.onInitialize((params) => {
+    // Recoger las opciones de inicialización
+    const formatOptions = params.initializationOptions?.formatOptions || {};
+    const formatKeywords = formatOptions.formatKeywords || false;
+    
+    console.log(`Opción formatKeywords recibida: ${formatKeywords}`);
+    
+    // Guardar la configuración para usarla más tarde
+    connection.workspaceConfig = {
+        formatKeywords
+    };
+    
     analyzeProjectFiles();
 
     return {
