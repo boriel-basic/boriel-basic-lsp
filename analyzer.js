@@ -57,8 +57,6 @@ function analyzeProjectFiles() {
     });
 
     console.log('Análisis inicial completado');
-    console.log('Definiciones globales:', globalDefinitions.get('PaginarMemoria'));
-    // console.log('Referencias globales:', globalReferences);
 }
 
 /**
@@ -79,24 +77,41 @@ function analyzeFileForDefinitions(filePath, uri) {
         }
 
         // Detectar definiciones de SUB o FUNCTION (con o sin FASTCALL y con parámetros con tipos)
-        const definitionMatch = /^\s*(SUB|FUNCTION)\s+(?:FASTCALL\s+)?([a-zA-Z_][a-zA-Z0-9_]*)\s*\(([^)]*)\)?/i.exec(trimmedLine);
+        const definitionMatch = /^\s*(SUB|FUNCTION)\s+(?:FASTCALL\s+)?([a-zA-Z_][a-zA-Z0-9_]*)\s*\(([^)]*)\)?\s*(?:AS\s+(\w+))?/i.exec(trimmedLine);
         if (definitionMatch) {
             const type = definitionMatch[1].toUpperCase(); // SUB o FUNCTION
             const name = definitionMatch[2]; // Nombre de la función o subrutina
             const parameters = definitionMatch[3]; // Parámetros (si existen)
+            const returnType = definitionMatch[4] || 'void'; // Tipo de retorno (si existe)
+            const header = trimmedLine;
             console.log(`Definición encontrada: ${type} ${name}(${parameters}) en ${filePath}, línea ${i + 1}`);
 
             // Almacenar el nombre normalizado (sin parámetros ni FASTCALL)
-            globalDefinitions.set(name, Location.create(uri, Range.create(i, 0, i, trimmedLine.length)));
+            globalDefinitions.set(name, {
+                uri,
+                range: {
+                    start: { line: i, character: 0 },
+                    end: { line: i, character: line.length }
+                },
+                type,
+                name,
+                parameters,
+                returnType,
+                header,
+            });
         }
 
         // Detectar definiciones de variables con DIM
-        const variableMatch = /^\s*DIM\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:AS\s+\w+)?\s*=/i.exec(trimmedLine);        if (variableMatch) {
+        const variableMatch = /^\s*DIM\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:AS\s+(\w+))?\s*=/i.exec(trimmedLine);        if (variableMatch) {
             const name = variableMatch[1]; // Nombre de la variable
+            const type = variableMatch[2] || ''; // Tipo de la variable (si existe)
             console.log(`Definición de variable encontrada: DIM ${name} en ${filePath}, línea ${i + 1}`);
 
             // Almacenar la definición de la variable
-            globalVariables.set(name, Location.create(uri, Range.create(i, 0, i, trimmedLine.length)));
+            globalVariables.set(name, {
+                location: Location.create(uri, Range.create(i, 0, i, trimmedLine.length)),
+                type
+            });
         }
     });
 }

@@ -5,9 +5,7 @@ const {
     Range,
     TextDocuments,
     TextDocumentSyncKind,
-    CompletionItem,
-    TextEdit,
-    Location
+    CompletionItemKind,
 } = require('vscode-languageserver/node');
 const { TextDocument } = require('vscode-languageserver-textdocument');
 
@@ -21,12 +19,12 @@ documents.listen(connection);
 
 const { borielBasicKeywords } = require('./const');
 const { formatBorielBasicCode } = require('./formatter');
-const { 
-    globalDefinitions, 
-    globalReferences, 
+const {
+    globalDefinitions,
+    globalReferences,
     globalVariables,
-    analyzeProjectFiles, 
-    analyzeFileForDefinitions, 
+    analyzeProjectFiles,
+    analyzeFileForDefinitions,
     analyzeFileForReferences,
 } = require('./analyzer');
 
@@ -47,7 +45,6 @@ connection.onDocumentFormatting((params) => {
 
 // Manejar solicitud de definición
 connection.onDefinition((params) => {
-    console.log("globalVariables: ", globalVariables);
     const document = documents.get(params.textDocument.uri);
     const position = params.position;
 
@@ -88,7 +85,7 @@ connection.onDefinition((params) => {
 
     // Buscar en definiciones de variables
     if (globalVariables.has(wordAtPosition)) {
-        const location = globalVariables.get(wordAtPosition);
+        const location = globalVariables.get(wordAtPosition).location;
         console.log(`Definición de variable encontrada para ${wordAtPosition}:`, location);
         return location;
     }
@@ -126,14 +123,14 @@ connection.onInitialize((params) => {
     // Recoger las opciones de inicialización
     const formatOptions = params.initializationOptions?.formatOptions || {};
     const formatKeywords = formatOptions.formatKeywords || false;
-    
+
     console.log(`Opción formatKeywords recibida: ${formatKeywords}`);
-    
+
     // Guardar la configuración para usarla más tarde
     connection.workspaceConfig = {
         formatKeywords
     };
-    
+
     analyzeProjectFiles();
 
     return {
@@ -145,6 +142,9 @@ connection.onInitialize((params) => {
             },
             completionProvider: {
                 resolveProvider: true // Permite resolver detalles adicionales de los ítems
+            },
+            signatureHelpProvider: {
+                triggerCharacters: ['(', ','] // Activar al escribir '(' o ','
             },
             documentFormattingProvider: true, // Habilitar el formato de documentos
             definitionProvider: true, // Habilitar ir a la definición
@@ -184,14 +184,95 @@ documents.onDidSave((event) => {
 
 // Proveer autocompletado
 connection.onCompletion(() => {
-    // Retornar las palabras clave como sugerencias de autocompletado
-    return borielBasicKeywords;
+    console.log('Generando sugerencias de autocompletado...');
+    console.log('CompletionItemKind:', CompletionItemKind);
+
+    // Agregar funciones definidas por el desarrollador
+    const functionCompletions = Array.from(globalDefinitions.keys()).map(funcName => {
+        const funcData = globalDefinitions.get(funcName);
+        if (funcData) {
+            return {
+                label: funcName,
+                kind: CompletionItemKind.Function,
+                detail: funcData.header,
+            };
+        }
+    });
+
+    // Agregar variables definidas por el desarrollador
+    const variableCompletions = Array.from(globalVariables.keys()).map(varName => {
+        console.log(globalVariables.get(varName));
+        const varType = globalVariables.get(varName).type;
+        return {
+            label: varName,
+            kind: CompletionItemKind.Variable,
+            detail: varType,
+            documentation: `Variable definida por el usuario`
+        };
+    });
+
+    // Retornar las palabras clave, funciones y variables como sugerencias de autocompletado
+    const keywordCompletions = borielBasicKeywords.map(keyword => ({
+        label: keyword.label,
+        kind: CompletionItemKind.Keyword,
+        detail: keyword.detail
+    }));
+
+    return [...keywordCompletions, ...functionCompletions, ...variableCompletions];
 });
 
 // Resolver detalles adicionales de los ítems de autocompletado
 connection.onCompletionResolve((item) => {
     // Puedes agregar más detalles aquí si es necesario
     return item;
+});
+
+connection.onSignatureHelp((params) => {
+    const document = documents.get(params.textDocument.uri);
+    const position = params.position;
+
+    if (!document) {
+        return null;
+    }
+
+    // Obtener la línea de texto en la posición actual
+    const lineText = document.getText({
+        start: { line: position.line, character: 0 },
+        end: { line: position.line, character: Number.MAX_SAFE_INTEGER }
+    });
+
+    // Extraer la palabra antes del paréntesis de apertura
+    const match = lineText.match(/(\w+)\s*\(/);
+    if (!match) {
+        return null;
+    }
+
+    const funcName = match[1];
+    console.log(`Buscando firma para la función: ${funcName}`);
+
+    // Buscar la función en las definiciones globales
+    const funcData = globalDefinitions.get(funcName);
+    if (!funcData) {
+        console.log(`No se encontró la función: ${funcName}`);
+        return null;
+    }
+
+    // Crear la respuesta de ayuda de firma
+    const parameters = funcData.parameters.split(',').map(param => param.trim());
+    const signature = {
+        label: `${funcName}(${funcData.parameters}) -> ${funcData.returnType}`,
+        documentation: `Función definida por el usuario.\n\nRetorna: ${funcData.returnType}`,
+        parameters: parameters.map(param => ({
+            label: param,
+            documentation: `Parámetro: ${param}`
+        }))
+    };
+
+    return {
+        signatures: [signature],
+        activeSignature: 0,
+        activeParameter: Math.max(0, params.context?.triggerCharacter === ',' ? parameters.length - 1 : 0)
+    };
 });
 
 // Escuchar la conexión

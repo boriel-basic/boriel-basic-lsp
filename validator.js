@@ -9,11 +9,9 @@ const { borielBasicKeywords } = require('./const');
 // Función para validar documentos Boriel Basic
 function validateBorielBasic(document, connection) {
     console.log('Validando documento:', document.uri);
-    console.log('globalVariables:', globalVariables);
 
     // Extraer de todos los elemenos de borielBasicKeywords la propiedad label
     const keywordLabels = Object.keys(borielBasicKeywords).map((key) => borielBasicKeywords[key].label);
-    console.log('Palabras clave:', keywordLabels);
 
     const text = document.getText();
     const diagnostics = [];

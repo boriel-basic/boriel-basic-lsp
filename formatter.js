@@ -26,12 +26,12 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
         console.log('Línea:', i, 'Indentación:', indentLevel, 'Texto:', trimmedLine);
 
         // Reducir nivel de indentación para palabras clave de cierre
-        if (/^\s*(END SUB|END FUNCTION|END IF|NEXT|WEND|LOOP|END ASM)\b/i.test(trimmedLine)) {
+        if (/^\s*(END SUB|END FUNCTION|END IF|NEXT|WEND|LOOP|END ASM|#ENDIF)\b/i.test(trimmedLine)) {
             indentLevel = Math.max(0, indentLevel - 1);
         }
 
         // Manejar bloques ELSE y ELSEIF
-        if (/^\s*(ELSE|ELSEIF\b.*)\b/i.test(trimmedLine)) {
+        if (/^\s*(ELSE|ELSEIF|#ELSE\b.*)\b/i.test(trimmedLine)) {
             const elseExpectedIndent = ' '.repeat(Math.max(0, (indentLevel - 1) * indentSize));
             let formattedElseLine = trimmedLine;
 
@@ -85,10 +85,10 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
         }
 
         // Aumentar nivel de indentación para palabras clave de apertura
-        if (/^\s*(SUB|FUNCTION|IF|FOR|WHILE|DO|ASM)\b/i.test(trimmedLine)) {
+        if (/^\s*(SUB|FUNCTION|IF|FOR|WHILE|DO|ASM|#IFDEF|#IFNDEF)\b/i.test(trimmedLine)) {
             
             // Si es un "IF ... THEN" con más contenido en la misma línea, no incrementar
-            if (/^\s*IF\b.+\bTHEN\b.+$/i.test(trimmedLine)) {
+            if (/^\s*(?!#IFDEF|#IFNDEF)\bIF\b.+\bTHEN\b.+$/i.test(trimmedLine)) {
                 console.log(`No se incrementa la indentación para la línea: "${trimmedLine}"`);
                 return;
             }
