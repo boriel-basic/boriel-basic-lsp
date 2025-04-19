@@ -148,7 +148,14 @@ connection.onInitialize((params) => {
             },
             documentFormattingProvider: true, // Habilitar el formato de documentos
             definitionProvider: true, // Habilitar ir a la definición
-            referencesProvider: true  // Habilitar encontrar referencias
+            referencesProvider: true,  // Habilitar encontrar referencias
+            semanticTokensProvider: {
+                legend: {
+                    tokenTypes: ['keyword', 'function', 'variable', 'string', 'number', 'comment'],
+                    tokenModifiers: []
+                },
+                full: true
+            }
         }
     };
 });
@@ -274,6 +281,223 @@ connection.onSignatureHelp((params) => {
         activeParameter: Math.max(0, params.context?.triggerCharacter === ',' ? parameters.length - 1 : 0)
     };
 });
+
+connection.languages.semanticTokens.on((params) => {
+    const document = documents.get(params.textDocument.uri);
+    if (!document) {
+        return { data: [] };
+    }
+
+    const text = document.getText();
+    const lines = text.split(/\r?\n/);
+    const tokens = [];
+
+    lines.forEach((line, lineIndex) => {
+        let remainingLine = line;
+        let currentCharIndex = 0;
+
+        // Detectar comentarios
+        const commentMatch = line.match(/(?:REM\b|')\s*(.*)/i);
+        if (commentMatch) {
+            const commentStart = line.indexOf(commentMatch[0]);
+            tokens.push({
+                line: lineIndex,
+                startChar: commentStart,
+                length: line.length - commentStart,
+                tokenType: 5, // 'comment'
+                tokenModifiers: []
+            });
+
+            // No procesar más tokens en esta línea después de un comentario
+            return;
+        }
+
+        // Detectar tokens compuestos
+        borielBasicKeywords
+            .filter(k => k.label.includes(' ')) // Filtrar solo tokens compuestos
+            .forEach(keyword => {
+                const keywordIndex = remainingLine.toUpperCase().indexOf(keyword.label.toUpperCase());
+                if (keywordIndex !== -1) {
+                    tokens.push({
+                        line: lineIndex,
+                        startChar: keywordIndex,
+                        length: keyword.label.length,
+                        tokenType: getTokenType(keyword.type),
+                        tokenModifiers: []
+                    });
+
+                    // Eliminar el token compuesto de la línea para evitar procesarlo dos veces
+                    remainingLine = remainingLine.slice(0, keywordIndex) + ' '.repeat(keyword.label.length) + remainingLine.slice(keywordIndex + keyword.label.length);
+                }
+            });
+
+        // Detectar cabeceras de funciones o subrutinas
+        if (/^\s*(Sub|Function)\b/i.test(line)) {
+            const match = line.match(/^\s*(Sub|Function)\s+(\w+)\s*\((.*)\)\s*(As\s+\w+)?/i);
+            if (match) {
+                const [, keyword, functionName, parameters, returnType] = match;
+
+                // Agregar el token para la palabra clave (Sub o Function)
+                tokens.push({
+                    line: lineIndex,
+                    startChar: line.indexOf(keyword),
+                    length: keyword.length,
+                    tokenType: 0, // 'keyword'
+                    tokenModifiers: []
+                });
+
+                // Agregar el token para el nombre de la función
+                tokens.push({
+                    line: lineIndex,
+                    startChar: line.indexOf(functionName),
+                    length: functionName.length,
+                    tokenType: 1, // 'function'
+                    tokenModifiers: []
+                });
+
+                // Procesar los parámetros
+                const params = parameters.split(',').map(param => param.trim());
+                params.forEach(param => {
+                    const paramMatch = param.match(/(\w+)\s+As\s+(\w+)/i);
+                    if (paramMatch) {
+                        const [, paramName, paramType] = paramMatch;
+
+                        // Buscar la posición del nombre del parámetro
+                        const paramNameStart = line.indexOf(paramName, currentCharIndex);
+
+                        // Agregar el token para el nombre del parámetro
+                        tokens.push({
+                            line: lineIndex,
+                            startChar: paramNameStart,
+                            length: paramName.length,
+                            tokenType: 2, // 'variable'
+                            tokenModifiers: []
+                        });
+
+                        // Buscar la posición de "As" y el tipo
+                        const asIndex = line.indexOf('As', paramNameStart + paramName.length);
+                        const typeStartChar = line.indexOf(paramType, asIndex + 2);
+
+                        // Agregar el token para el tipo del parámetro
+                        tokens.push({
+                            line: lineIndex,
+                            startChar: typeStartChar,
+                            length: paramType.length,
+                            tokenType: 4, // 'type'
+                            tokenModifiers: []
+                        });
+
+                        // Actualizar el índice actual para evitar conflictos con parámetros posteriores
+                        currentCharIndex = typeStartChar + paramType.length;
+                    }
+                });
+
+                // Procesar el tipo de retorno
+                if (returnType) {
+                    const returnTypeMatch = returnType.match(/As\s+(\w+)/i);
+                    if (returnTypeMatch) {
+                        const [, returnTypeName] = returnTypeMatch;
+
+                        // Buscar la posición de "As" y el tipo de retorno
+                        const returnAsIndex = line.indexOf('As', line.indexOf(')') + 1);
+                        const returnTypeStartChar = line.indexOf(returnTypeName, returnAsIndex + 2);
+
+                        // Agregar el token para el tipo de retorno
+                        tokens.push({
+                            line: lineIndex,
+                            startChar: returnTypeStartChar,
+                            length: returnTypeName.length,
+                            tokenType: 4, // 'type'
+                            tokenModifiers: []
+                        });
+                    }
+                }
+            }
+        }
+
+        // Detectar palabras clave y otros tokens
+        const words = remainingLine.split(/\s+/);
+
+        words.forEach((word, wordIndex) => {
+            const startChar = line.indexOf(word, wordIndex > 0 ? line.indexOf(words[wordIndex - 1]) + words[wordIndex - 1].length : 0);
+            const length = word.length;
+
+            // Detectar palabras clave
+            const keyword = borielBasicKeywords.find(k => k.label.toUpperCase() === word.toUpperCase());
+            if (keyword) {
+                tokens.push({
+                    line: lineIndex,
+                    startChar,
+                    length,
+                    tokenType: getTokenType(keyword.type),
+                    tokenModifiers: []
+                });
+                return;
+            }
+
+            // Detectar variables
+            if (globalVariables.has(word)) {
+                tokens.push({
+                    line: lineIndex,
+                    startChar,
+                    length,
+                    tokenType: 2, // 'variable'
+                    tokenModifiers: []
+                });
+                return;
+            }
+        });
+
+        // Detectar palabras clave de tipo 'type' en cualquier contexto
+        borielBasicKeywords
+            .filter(k => k.type === 'type') // Filtrar solo palabras clave de tipo 'type'
+            .forEach(typeKeyword => {
+                let typeIndex = remainingLine.toUpperCase().indexOf(typeKeyword.label.toUpperCase());
+                while (typeIndex !== -1) {
+                    tokens.push({
+                        line: lineIndex,
+                        startChar: typeIndex,
+                        length: typeKeyword.label.length,
+                        tokenType: 4, // 'type'
+                        tokenModifiers: []
+                    });
+
+                    // Continuar buscando más ocurrencias en la misma línea
+                    typeIndex = remainingLine.toUpperCase().indexOf(typeKeyword.label.toUpperCase(), typeIndex + typeKeyword.label.length);
+                }
+            });
+    });
+
+    // Convertir los tokens al formato esperado
+    const data = [];
+    let lastLine = 0;
+    let lastChar = 0;
+
+    tokens.forEach(token => {
+        const deltaLine = token.line - lastLine;
+        const deltaStart = deltaLine === 0 ? token.startChar - lastChar : token.startChar;
+
+        data.push(deltaLine, deltaStart, token.length, token.tokenType, 0);
+
+        lastLine = token.line;
+        lastChar = token.startChar;
+    });
+
+    return { data };
+});
+
+// Función para obtener el tipo de token
+function getTokenType(type) {
+    switch (type) {
+        case 'logic': return 0; // 'keyword'
+        case 'control': return 3; // 'control'
+        case 'type': return 4; // 'type'
+        case 'definition': return 5; // 'definition'
+        case 'io': return 6; // 'io'
+        case 'keyword': return 0; // 'keyword'
+        default: return 0; // Default to 'keyword'
+    }
+}
 
 // Escuchar la conexión
 connection.listen();
