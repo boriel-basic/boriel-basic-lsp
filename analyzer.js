@@ -33,7 +33,7 @@ if (fs.existsSync(gitignorePath)) {
  * Analiza todos los archivos del proyecto para encontrar definiciones y referencias.
  */
 function analyzeProjectFiles() {
-    const pattern = `${projectPath}/**/*.bas`;
+    const pattern = `${projectPath}/**/*.{bas,zxbas}`;
 
     console.log('Ruta del proyecto:', projectPath);
     console.log('Patrón de búsqueda:', pattern);

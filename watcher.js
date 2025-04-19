@@ -1,7 +1,7 @@
 function watchBasicFiles() {
     const chokidar = require('chokidar');
 
-    const watcher = chokidar.watch('**/*.bas', {
+    const watcher = chokidar.watch('**/*.{bas,zxbas}', {
         ignored: /node_modules/, // Ignorar la carpeta node_modules
         persistent: true
     });
