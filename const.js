@@ -39,10 +39,10 @@ const borielBasicKeywords = [
     { label: 'LET', kind: CompletionItemKind.Keyword, detail: 'Asigna un valor a una variable', type: 'definition' },
 
     // Entrada/Salida
-    { label: 'PRINT', kind: CompletionItemKind.Keyword, detail: 'Imprime texto o valores en pantalla', type: 'io' },
-    { label: 'INPUT', kind: CompletionItemKind.Keyword, detail: 'Solicita entrada del usuario', type: 'io' },
-    { label: 'CLS', kind: CompletionItemKind.Keyword, detail: 'Limpia la pantalla', type: 'io' },
-    { label: 'PAUSE', kind: CompletionItemKind.Keyword, detail: 'Pausa la ejecución del programa', type: 'io' },
+    { label: 'PRINT', kind: CompletionItemKind.Keyword, detail: 'Imprime texto o valores en pantalla', type: 'keyword' },
+    { label: 'INPUT', kind: CompletionItemKind.Keyword, detail: 'Solicita entrada del usuario', type: 'keyword' },
+    { label: 'CLS', kind: CompletionItemKind.Keyword, detail: 'Limpia la pantalla', type: 'keyword' },
+    { label: 'PAUSE', kind: CompletionItemKind.Keyword, detail: 'Pausa la ejecución del programa', type: 'keyword' },
 
     // Operadores
     { label: 'AND', kind: CompletionItemKind.Keyword, detail: 'Operador lógico AND', type: 'logic' },
@@ -106,7 +106,7 @@ const borielBasicKeywords = [
     { label: 'WAIT', kind: CompletionItemKind.Keyword, detail: 'Espera un evento' },
     { label: 'CLS', kind: CompletionItemKind.Keyword, detail: 'Limpia la pantalla' },
 
-    { label: 'UNTIL', kind: CompletionItemKind.Keyword, detail: 'Espera hasta que se cumpla una condición' },
+    { label: 'UNTIL', kind: CompletionItemKind.Keyword, detail: 'Espera hasta que se cumpla una condición', type: 'control' },
     { label: 'INKEY$', kind: CompletionItemKind.Function, detail: 'Lee una tecla presionada' },
 ];
 

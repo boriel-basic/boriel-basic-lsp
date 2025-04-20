@@ -35,7 +35,9 @@ if (fs.existsSync(gitignorePath)) {
  * Analiza todos los archivos del proyecto para encontrar definiciones y referencias.
  */
 function analyzeProjectFiles() {
-    const pattern = URI.parse(projectPath + '/**/*.{bas,zxbas}').fsPath
+    const pattern = projectPath.replace(/\\/g, '/') + '/**/*.{bas,zxbas}'
+
+    console.log('Buscando archivos con patrón:', pattern);
 
     const files = glob.sync(pattern);
 
@@ -51,6 +53,7 @@ function analyzeProjectFiles() {
     filteredFiles.forEach((file) => {
         const uri = URI.parse(file).fsPath;
         console.log(`Analizando definiciones en archivo: ${file}`);
+        console.log(`URI: ${uri}`);
         analyzeFileForDefinitions(file, uri);
         analyzeFileForReferences(file, uri);
     });

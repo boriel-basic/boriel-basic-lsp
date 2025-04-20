@@ -9,6 +9,9 @@ const {
 } = require('vscode-languageserver/node');
 const { TextDocument } = require('vscode-languageserver-textdocument');
 const { URI } = require('vscode-uri');
+const path = require('path');
+
+const projectPath = process.argv[2];
 
 // Crear conexión con el cliente
 const connection = createConnection();
@@ -68,27 +71,26 @@ connection.onDefinition((params) => {
         return null;
     }
 
-    // if wordAtPosition is a function or subroutine
+    // Normalizar la palabra eliminando paréntesis y parámetros
     if (wordAtPosition.includes('(')) {
         wordAtPosition = wordAtPosition.split('(')[0].trim();
-        console.log(`Buscando definición para: ${wordAtPosition}`);
-        // Normalizar la palabra eliminando paréntesis y parámetros
-        wordAtPosition = wordAtPosition.split('(')[0].trim();
-        console.log(`Buscando definición para: ${wordAtPosition}`);
-
-        // Buscar en definiciones de funciones
-        if (globalDefinitions.has(wordAtPosition)) {
-            const location = globalDefinitions.get(wordAtPosition);
-            console.log(`Definición de función encontrada para ${wordAtPosition}:`, location);
-            return location;
-        }
     }
 
-    // Buscar en definiciones de variables
-    if (globalVariables.has(wordAtPosition)) {
-        const location = globalVariables.get(wordAtPosition).location;
-        console.log(`Definición de variable encontrada para ${wordAtPosition}:`, location);
-        return location;
+    console.log(`Buscando definición para: ${wordAtPosition}`);
+
+    // Buscar en definiciones de funciones
+    if (globalDefinitions.has(wordAtPosition)) {
+        const definition = globalDefinitions.get(wordAtPosition);
+
+        // Convertir la URI absoluta en una ruta relativa al directorio del proyecto
+        const relativePath = path.relative(projectPath, URI.parse(definition.uri).fsPath);
+
+        console.log(`Definición encontrada para ${wordAtPosition}:`, relativePath);
+
+        return {
+            uri: `file://${path.join(projectPath, relativePath)}`,
+            range: definition.range
+        };
     }
 
     console.log(`No se encontró definición para: ${wordAtPosition}`);
