@@ -9,6 +9,8 @@ const globalDefinitions = new Map(); // { nombre: Location }
 const globalReferences = new Map(); // { nombre: [Location, ...] }
 const globalVariables = new Map(); // { nombre: Location }
 
+const { URI } = require('vscode-uri');
+
 // Obtener la ruta del proyecto desde los argumentos
 const projectPath = process.argv[2]; // La ruta del proyecto se pasa como argumento al servidor
 
@@ -33,10 +35,7 @@ if (fs.existsSync(gitignorePath)) {
  * Analiza todos los archivos del proyecto para encontrar definiciones y referencias.
  */
 function analyzeProjectFiles() {
-    const pattern = path.join(projectPath, '**', '*.{bas,zxbas}'); // Construir el patrón de búsqueda compatible con el sistema operativo
-
-    console.log('Ruta del proyecto:', projectPath);
-    console.log('Patrón de búsqueda:', pattern);
+    const pattern = URI.parse(projectPath + '/**/*.{bas,zxbas}').fsPath
 
     const files = glob.sync(pattern);
 
@@ -50,7 +49,7 @@ function analyzeProjectFiles() {
 
     // Primer pase: analizar definiciones
     filteredFiles.forEach((file) => {
-        const uri = `file://${file}`;
+        const uri = URI.parse(file).fsPath;
         console.log(`Analizando definiciones en archivo: ${file}`);
         analyzeFileForDefinitions(file, uri);
         analyzeFileForReferences(file, uri);

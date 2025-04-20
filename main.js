@@ -8,6 +8,7 @@ const {
     CompletionItemKind,
 } = require('vscode-languageserver/node');
 const { TextDocument } = require('vscode-languageserver-textdocument');
+const { URI } = require('vscode-uri');
 
 // Crear conexión con el cliente
 const connection = createConnection();
@@ -178,7 +179,7 @@ documents.onDidChangeContent((event) => {
 documents.onDidSave((event) => {
     const document = event.document;
     const uri = document.uri;
-    const filePath = uri.replace('file://', '');
+    const filePath = URI.parse(uri).fsPath;
 
     console.log(`Archivo guardado: ${filePath}. Reanalizando definiciones y referencias...`);
 
