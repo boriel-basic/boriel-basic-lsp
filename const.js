@@ -31,6 +31,8 @@ const borielBasicKeywords = [
     { label: 'SUB', kind: CompletionItemKind.Keyword, detail: 'Define un procedimiento', type: 'keyword' },
     { label: 'FUNCTION', kind: CompletionItemKind.Keyword, detail: 'Define una función', type: 'keyword' },
     { label: 'END', kind: CompletionItemKind.Keyword, detail: 'Define una función', type: 'keyword' },
+    { label: 'ASM', kind: CompletionItemKind.Keyword, detail: 'Apertura de código ASM', type: 'keyword' },
+    { label: 'END ASM', kind: CompletionItemKind.Keyword, detail: 'Clausura de código ASM', type: 'keyword' },
 
     // Declaraciones
     { label: 'DIM', kind: CompletionItemKind.Keyword, detail: 'Declara un array', type: 'definition' },
