@@ -82,13 +82,10 @@ connection.onDefinition((params) => {
     if (globalDefinitions.has(wordAtPosition)) {
         const definition = globalDefinitions.get(wordAtPosition);
 
-        // Convertir la URI absoluta en una ruta relativa al directorio del proyecto
-        const relativePath = path.relative(projectPath, URI.parse(definition.uri).fsPath);
-
-        console.log(`Definición encontrada para ${wordAtPosition}:`, relativePath);
+        console.log(`Definición encontrada para ${wordAtPosition}:`, definition.uri);
 
         return {
-            uri: `file://${path.join(projectPath, relativePath)}`,
+            uri: definition.uri,
             range: definition.range
         };
     }
@@ -184,6 +181,7 @@ documents.onDidSave((event) => {
     const filePath = URI.parse(uri).fsPath;
 
     console.log(`Archivo guardado: ${filePath}. Reanalizando definiciones y referencias...`);
+    console.log(`URI: ${uri}`);
 
     // Volver a analizar el archivo para encontrar definiciones y referencias
     analyzeFileForDefinitions(filePath, uri);

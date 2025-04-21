@@ -51,10 +51,22 @@ function analyzeProjectFiles() {
 
     // Primer pase: analizar definiciones
     filteredFiles.forEach((file) => {
-        const uri = URI.parse(file).fsPath;
         console.log(`Analizando definiciones en archivo: ${file}`);
-        console.log(`URI: ${uri}`);
+
+        // convertir el file en uri
+        const uri = URI.file(file).toString();
+
+        console.log(`Analizando uri: ${uri}`);
+
         analyzeFileForDefinitions(file, uri);
+    });
+
+    // Segundo pase: analizar referencias
+    filteredFiles.forEach((file) => {
+        console.log(`Analizando referencias en archivo: ${file}`);
+        // convertir el file en uri
+        const uri = URI.file(file).toString();
+        console.log(`Analizando uri: ${uri}`);
         analyzeFileForReferences(file, uri);
     });
 
