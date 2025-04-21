@@ -115,16 +115,66 @@ function analyzeFileForDefinitions(filePath, uri) {
             });
         }
 
-        // Detectar definiciones de variables con DIM
-        const variableMatch = /^\s*DIM\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:AS\s+(\w+))?\s*=/i.exec(trimmedLine);        if (variableMatch) {
-            const name = variableMatch[1]; // Nombre de la variable
-            const type = variableMatch[2] || ''; // Tipo de la variable (si existe)
-            console.log(`Definición de variable encontrada: DIM ${name} en ${filePath}, línea ${i + 1}`);
+        // Detectar definiciones de variables con DIM (incluyendo arrays multidimensionales)
+        const variableMatch = /^\s*DIM\s+([a-zA-Z_][a-zA-Z0-9_]*)(\([^\)]*\))?\s*(?:AS\s+(\w+))?(?:\s*=\s*(.+))?/i.exec(trimmedLine);
+        if (variableMatch) {
+            const name = variableMatch[1]; // Nombre de la variable o array
+            const dimensions = variableMatch[2] || null; // Dimensiones del array (si existen)
+            const type = variableMatch[3] || 'unknown'; // Tipo de la variable (si existe)
+            const value = variableMatch[4] || null; // Valor de la variable (si existe)
 
-            // Almacenar la definición de la variable
+            console.log(`Procesando línea ${i + 1}: ${trimmedLine}`);
+            console.log(`Definición de variable encontrada: DIM ${name}${dimensions || ''} AS ${type}${value ? ` = ${value}` : ''} en ${filePath}, línea ${i + 1}`);
+
+            // Procesar dimensiones del array
+            let parsedDimensions = null;
+            if (dimensions) {
+                parsedDimensions = dimensions
+                    .replace(/[()]/g, '') // Eliminar paréntesis
+                    .split(',') // Dividir por comas
+                    .map(dim => dim.trim()); // Eliminar espacios en blanco
+            }
+
+            console.log(`Dimensiones procesadas para ${name}:`, parsedDimensions);
+
+            // Almacenar la definición de la variable o array
             globalVariables.set(name, {
                 location: Location.create(uri, Range.create(i, 0, i, trimmedLine.length)),
-                type
+                type,
+                value,
+                dimensions: parsedDimensions
+            });
+        }
+
+        // Detectar definiciones de constantes con CONST
+        const constantMatch = /^\s*CONST\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:AS\s+(\w+))?\s*=\s*(.+)/i.exec(trimmedLine);
+        if (constantMatch) {
+            const name = constantMatch[1]; // Nombre de la constante
+            const type = constantMatch[2] || 'unknown'; // Tipo de la constante (si existe)
+            const value = constantMatch[3]; // Valor de la constante
+            console.log(`Definición de constante encontrada: CONST ${name} AS ${type} = ${value} en ${filePath}, línea ${i + 1}`);
+
+            // Almacenar la definición de la constante
+            globalVariables.set(name, {
+                location: Location.create(uri, Range.create(i, 0, i, trimmedLine.length)),
+                type: 'constant',
+                value,
+                dataType: type
+            });
+        }
+
+        // Detectar macros con #DEFINE
+        const macroMatch = /^\s*#DEFINE\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(.+)?/i.exec(trimmedLine);
+        if (macroMatch) {
+            const name = macroMatch[1]; // Nombre de la macro
+            const value = macroMatch[2] || ''; // Valor de la macro (si existe)
+            console.log(`Definición de macro encontrada: #DEFINE ${name} ${value} en ${filePath}, línea ${i + 1}`);
+
+            // Almacenar la definición de la macro
+            globalVariables.set(name, {
+                location: Location.create(uri, Range.create(i, 0, i, trimmedLine.length)),
+                type: 'macro',
+                value
             });
         }
     });

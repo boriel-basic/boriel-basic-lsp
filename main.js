@@ -426,6 +426,8 @@ connection.languages.semanticTokens.on((params) => {
         const words = remainingLine.split(/\s+/);
 
         words.forEach((word, wordIndex) => {
+            // Eliminar paréntesis y su contenido del nombre
+            word = word.replace(/\([^()]*\)$/, '');
             const startChar = line.indexOf(word, wordIndex > 0 ? line.indexOf(words[wordIndex - 1]) + words[wordIndex - 1].length : 0);
             const length = word.length;
 
