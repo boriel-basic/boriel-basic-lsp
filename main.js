@@ -223,13 +223,19 @@ connection.onCompletion(() => {
 
     // Retornar las palabras clave, funciones y variables como sugerencias de autocompletado
     const keywordCompletions = borielBasicKeywords.map(keyword => ({
-        label: keyword.label,
+        label: toPascalCase(keyword.label),
         kind: CompletionItemKind.Keyword,
         detail: keyword.detail
     }));
 
     return [...keywordCompletions, ...functionCompletions, ...variableCompletions];
 });
+
+function toPascalCase(str) {
+    return str
+        .toLowerCase()
+        .replace(/(?:^|_|\s|-)(\w)/g, (_, c) => (c ? c.toUpperCase() : ''));
+}
 
 // Resolver detalles adicionales de los ítems de autocompletado
 connection.onCompletionResolve((item) => {
