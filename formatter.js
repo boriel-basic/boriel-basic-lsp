@@ -86,7 +86,11 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
 
         // Aumentar nivel de indentación para palabras clave de apertura
         if (/^\s*(SUB|FUNCTION|IF|FOR|WHILE|DO|ASM|#IFDEF|#IFNDEF)\b/i.test(trimmedLine)) {
-            
+            // Excepción: "Do Loop", "Do Loop While ..." y "Do Loop Until ..." en una sola línea no incrementa indentación
+            if (/^\s*DO\s+LOOP(\s+(WHILE|UNTIL)\s+.+)?\s*$/i.test(trimmedLine)) {
+                console.log('No se incrementa la indentación para "Do Loop" en una sola línea.');
+                return;
+            }
             // Si es un "IF ... THEN" con más contenido en la misma línea, no incrementar
             if (/^\s*(?!#IFDEF|#IFNDEF)\bIF\b.+\bTHEN\b.+$/i.test(trimmedLine)) {
                 console.log(`No se incrementa la indentación para la línea: "${trimmedLine}"`);
