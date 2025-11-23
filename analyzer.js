@@ -14,7 +14,7 @@ const { URI } = require('vscode-uri');
 // Registrar definiciones builtin (funciones integradas) aquí para que
 // estén disponibles en hover/completion/definition incluso si no existen
 // en los archivos del proyecto.
-const builtinDefinitions = require('./functionsDefinitions.json');
+const builtinDefinitions = require('./functionsDefinitions');
 
 builtinDefinitions.forEach(def => {
     const uri = `builtin://${def.name}`;
