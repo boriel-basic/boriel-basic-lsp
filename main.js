@@ -30,6 +30,7 @@ const {
     analyzeProjectFiles,
     analyzeFileForDefinitions,
     analyzeFileForReferences,
+    stripComments,
 } = require('./analyzer');
 
 // Manejar el evento de formato de documentos
@@ -57,6 +58,12 @@ connection.onDefinition((params) => {
         start: { line: position.line, character: 0 },
         end: { line: position.line, character: Number.MAX_SAFE_INTEGER }
     });
+
+    // Verificar si la posición está dentro de un comentario
+    const strippedLine = stripComments(lineText);
+    if (position.character >= strippedLine.length) {
+        return null; // Está en un comentario
+    }
 
     // Extraer la palabra en la posición actual
     const words = lineText.trim().split(/\s+/);
@@ -103,6 +110,12 @@ connection.onReferences((params) => {
     }
 
     const lineText = document.getText(Range.create(position.line, 0, position.line, document.getText().length));
+
+    // Verificar si la posición está dentro de un comentario
+    const strippedLine = stripComments(lineText);
+    if (position.character >= strippedLine.length) {
+        return []; // Está en un comentario
+    }
     const words = lineText.trim().split(/\s+/).map(word => word.replace(/[^\w]/g, ''));
 
     console.log(`Palabras detectadas en la línea ${position.line + 1}:`, words);
@@ -130,6 +143,12 @@ connection.onHover((params) => {
         start: { line: position.line, character: 0 },
         end: { line: position.line, character: Number.MAX_SAFE_INTEGER }
     });
+
+    // Verificar si la posición está dentro de un comentario
+    const strippedLine = stripComments(lineText);
+    if (position.character >= strippedLine.length) {
+        return null; // Está en un comentario
+    }
 
     // Encontrar la palabra en la posición del cursor
     // Usamos una regex que incluya caracteres válidos para identificadores
@@ -324,6 +343,12 @@ connection.onSignatureHelp((params) => {
         end: { line: position.line, character: Number.MAX_SAFE_INTEGER }
     });
 
+    // Verificar si la posición está dentro de un comentario
+    const strippedLine = stripComments(lineText);
+    if (position.character >= strippedLine.length) {
+        return null; // Está en un comentario
+    }
+
     // Extraer la palabra antes del paréntesis de apertura
     const match = lineText.match(/(\w+)\s*\(/);
     if (!match) {
@@ -388,12 +413,12 @@ connection.languages.semanticTokens.on((params) => {
     lines.forEach((line, lineIndex) => {
         let remainingLine = line;
         let currentCharIndex = 0;
-
-        // Detectar comentarios
         let commentToken = null;
-        const commentMatch = line.match(/(?:REM\b|')\s*(.*)/i);
-        if (commentMatch) {
-            const commentStart = line.indexOf(commentMatch[0]);
+
+        // Detectar comentarios de forma robusta
+        const strippedLine = stripComments(line);
+        if (strippedLine.length < line.length) {
+            const commentStart = strippedLine.length;
             commentToken = {
                 line: lineIndex,
                 startChar: commentStart,
@@ -403,7 +428,7 @@ connection.languages.semanticTokens.on((params) => {
             };
 
             // Truncar la línea para no procesar el comentario como código
-            remainingLine = line.substring(0, commentStart);
+            remainingLine = strippedLine;
         }
 
         // Detectar tokens compuestos

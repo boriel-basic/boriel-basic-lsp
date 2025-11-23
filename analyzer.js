@@ -42,6 +42,131 @@ Ejemplo:
 `,
 });
 
+const builtinPutCharsUri = 'builtin://putChars';
+globalDefinitions.set('putChars', {
+    uri: builtinPutCharsUri,
+    range: {
+        start: { line: 0, character: 0 },
+        end: { line: 0, character: 0 }
+    },
+    type: 'SUB',
+    name: 'putChars',
+    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, dataAddress as uInteger',
+    returnType: 'void',
+    header: 'SUB putChars(x as uByte, y as uByte, width as uByte, height as uByte, dataAddress as uInteger)',
+    doc: `
+putChars: Fills a rectangle region of the screen width a char
+
+Parameters:
+- x (uByte): x coordinate (cell column)
+- y (uByte): y coordinate (cell row)
+- width (uByte): width (number of columns)
+- height (uByte): height (number of rows)
+- dataAddress (uInteger): Chars bytes address
+`,
+});
+
+const builtinGetCharsUri = 'builtin://getChars';
+globalDefinitions.set('getChars', {
+    uri: builtinGetCharsUri,
+    range: {
+        start: { line: 0, character: 0 },
+        end: { line: 0, character: 0 }
+    },
+    type: 'SUB',
+    name: 'getChars',
+    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, dataAddress as uInteger',
+    returnType: 'void',
+    header: 'SUB getChars(x as uByte, y as uByte, width as uByte, height as uByte, dataAddress as uInteger)',
+    doc: `
+getChars: Gets a rectangle region of the screen into many chars (opposite of putChars)
+
+Parameters:
+- x (uByte): x coordinate (cell column)
+- y (uByte): y coordinate (cell row)
+- width (uByte): width (number of columns)
+- height (uByte): height (number of rows)
+- dataAddress (uInteger): Chars bytes address
+`,
+});
+
+const builtinPaintUri = 'builtin://paint';
+globalDefinitions.set('paint', {
+    uri: builtinPaintUri,
+    range: {
+        start: { line: 0, character: 0 },
+        end: { line: 0, character: 0 }
+    },
+    type: 'SUB',
+    name: 'paint',
+    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, attribute as uByte',
+    returnType: 'void',
+    header: 'SUB paint(x as uByte, y as uByte, width as uByte, height as uByte, attribute as uByte)',
+    doc: `
+paint: Fills a rectangle region of the screen width a color
+
+Parameters:
+- x (uByte): x coordinate (cell column)
+- y (uByte): y coordinate (cell row)
+- width (uByte): width (number of columns)
+- height (uByte): height (number of rows)
+- attribute (uByte): byte-encoded attr
+`,
+});
+
+const builtinGetPaintDataUri = 'builtin://getPaintData';
+globalDefinitions.set('getPaintData', {
+    uri: builtinGetPaintDataUri,
+    range: {
+        start: { line: 0, character: 0 },
+        end: { line: 0, character: 0 }
+    },
+    type: 'SUB',
+    name: 'getPaintData',
+    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, address as uInteger',
+    returnType: 'void',
+    header: 'SUB getPaintData(x as uByte, y as uByte, width as uByte, height as uByte, address as uInteger)',
+    doc: `
+getPaintData: Gets the colors of a rectangle region of the screen into memory (opposite of paintData)
+
+Parameters:
+- x (uByte): x coordinate (cell column)
+- y (uByte): y coordinate (cell row)
+- width (uByte): width (number of columns)
+- height (uByte): height (number of rows)
+- address (uInteger): address of the byte-encoded attr sequence
+`,
+});
+
+const builtinPutCharsOverModeUri = 'builtin://putCharsOverMode';
+globalDefinitions.set('putCharsOverMode', {
+    uri: builtinPutCharsOverModeUri,
+    range: {
+        start: { line: 0, character: 0 },
+        end: { line: 0, character: 0 }
+    },
+    type: 'SUB',
+    name: 'putCharsOverMode',
+    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, overMode as uByte, dataAddress as uInteger',
+    returnType: 'void',
+    header: 'SUB putCharsOverMode(x as uByte, y as uByte, width as uByte, height as uByte, overMode as uByte, dataAddress as uInteger)',
+    doc: `
+putCharsOverMode: Fills a rectangle region of the screen width a char
+
+Parameters:
+- x (uByte): x coordinate (cell column)
+- y (uByte): y coordinate (cell row)
+- width (uByte): width (number of columns)
+- height (uByte): height (number of rows)
+- overMode (uByte): the way the characters are combined with the background.
+    - 0: the characters are simply replaced.
+    - 1: the characters are combined with an Exclusive OR (XOR).
+    - 2: the characters are combined using an AND function.
+    - 3: the characters are combined using an OR function.
+- dataAddress (uInteger): Chars bytes address
+`,
+});
+
 // Obtener la ruta del proyecto desde los argumentos
 const projectPath = process.argv[2]; // La ruta del proyecto se pasa como argumento al servidor
 
@@ -105,6 +230,52 @@ function analyzeProjectFiles() {
 }
 
 /**
+ * Elimina los comentarios de una línea de código, respetando las cadenas de texto.
+ * @param {string} line - La línea de código a procesar.
+ * @returns {string} - La línea sin comentarios.
+ */
+function stripComments(line) {
+    let inString = false;
+    let result = '';
+
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+
+        if (char === '"') {
+            inString = !inString;
+            result += char;
+            continue;
+        }
+
+        if (!inString) {
+            // Detectar comentario con '
+            if (char === "'") {
+                break; // El resto de la línea es comentario
+            }
+
+            // Detectar comentario con REM (debe ser palabra completa)
+            if (line.substr(i, 3).toUpperCase() === 'REM') {
+                // Verificar que REM sea una palabra completa (seguido de espacio o fin de línea)
+                // y precedido por espacio, inicio de línea o dos puntos
+                const nextChar = line[i + 3];
+                const prevChar = i > 0 ? line[i - 1] : ' ';
+
+                const isWordEnd = !nextChar || /\s/.test(nextChar);
+                const isWordStart = /\s|:/.test(prevChar);
+
+                if (isWordEnd && isWordStart) {
+                    break; // El resto de la línea es comentario
+                }
+            }
+        }
+
+        result += char;
+    }
+
+    return result;
+}
+
+/**
  * Analiza un archivo para encontrar definiciones de funciones y subrutinas.
  * @param {string} filePath - Ruta del archivo.
  * @param {string} uri - URI del archivo.
@@ -114,10 +285,12 @@ function analyzeFileForDefinitions(filePath, uri) {
     const lines = text.split(/\r?\n/);
 
     lines.forEach((line, i) => {
-        const trimmedLine = line.trim();
+        // Usar stripComments para ignorar comentarios
+        const codeLine = stripComments(line);
+        const trimmedLine = codeLine.trim();
 
-        // Ignorar líneas que son comentarios o están vacías
-        if (trimmedLine.startsWith("'") || trimmedLine === '') {
+        // Ignorar líneas vacías
+        if (trimmedLine === '') {
             return;
         }
 
@@ -221,10 +394,12 @@ function analyzeFileForReferences(filePath, uri) {
     const lines = text.split(/\r?\n/);
 
     lines.forEach((line, i) => {
-        const trimmedLine = line.trim();
+        // Usar stripComments para ignorar comentarios
+        const codeLine = stripComments(line);
+        const trimmedLine = codeLine.trim();
 
-        // Ignorar líneas que son comentarios o están vacías
-        if (trimmedLine.startsWith("'") || trimmedLine === '') {
+        // Ignorar líneas vacías
+        if (trimmedLine === '') {
             return;
         }
 
@@ -253,4 +428,5 @@ module.exports = {
     globalDefinitions,
     globalReferences,
     globalVariables,
+    stripComments,
 };

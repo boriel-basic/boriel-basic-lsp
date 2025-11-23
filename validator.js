@@ -3,7 +3,7 @@ const {
     DiagnosticSeverity,
 } = require('vscode-languageserver/node');
 
-const { globalVariables, globalDefinitions } = require('./analyzer');
+const { globalVariables, globalDefinitions, stripComments } = require('./analyzer');
 const { borielBasicKeywords } = require('./const');
 
 // Función para validar documentos Boriel Basic
@@ -21,7 +21,14 @@ function validateBorielBasic(document, connection) {
     const openIfStack = []; // Pila para rastrear los bloques IF abiertos
 
     lines.forEach((line, i) => {
-        const trimmedLine = line.trim();
+        // Usar stripComments para ignorar comentarios
+        const codeLine = stripComments(line);
+        const trimmedLine = codeLine.trim();
+
+        // Ignorar líneas vacías (ya que stripComments deja string vacío si era solo comentario)
+        if (trimmedLine === '') {
+            return;
+        }
 
         // Detectar palabras reservadas mal escritas (ejemplo: "pritn" en lugar de "print")
         const typoIndex = trimmedLine.indexOf('pritn');
@@ -106,7 +113,7 @@ function validateBorielBasic(document, connection) {
         diagnostics.push({
             range: Range.create(lineNumber, 0, lineNumber, lines[lineNumber].length),
             message: 'Falta "End If" para esta estructura condicional.',
-            severity: DiagnosticDiagnosticSeverity.Error
+            severity: DiagnosticSeverity.Error
         });
     });
 

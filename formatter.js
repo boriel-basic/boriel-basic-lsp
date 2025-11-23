@@ -18,6 +18,12 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
             keyword.label.replace(/\\\$/g, '$').toUpperCase()
         )
     );
+        // Crear un conjunto de funciones builtin (type: 'function') para camelCase
+        const builtinFunctionsSet = new Set(
+            borielBasicKeywords
+                .filter(keyword => keyword.type === 'function')
+                .map(keyword => keyword.label.toUpperCase())
+        );
 
     lines.forEach((line, i) => {
         const trimmedLine = line.trim();
@@ -96,11 +102,19 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
             }
 
             codePart = codePart.replace(/[\w\$]+/g, (word) => {
-                const pascalWord = keywordsSet.has(word.toUpperCase())
-                    ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                    : word;
-                console.log(`Palabra formateada: "${word}" -> "${pascalWord}"`);
-                return pascalWord;
+                    const upperWord = word.toUpperCase();
+                    if (builtinFunctionsSet.has(upperWord)) {
+                        // camelCase para funciones builtin
+                        const camel = word.charAt(0).toLowerCase() + word.slice(1);
+                        console.log(`Función builtin formateada: "${word}" -> "${camel}"`);
+                        return camel;
+                    }
+                    if (keywordsSet.has(upperWord)) {
+                        const pascalWord = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                        console.log(`Palabra clave formateada: "${word}" -> "${pascalWord}"`);
+                        return pascalWord;
+                    }
+                    return word;
             });
 
             formattedLine = codePart + commentPart;
