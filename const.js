@@ -116,6 +116,57 @@ const borielBasicKeywords = [
 
     { label: 'UNTIL', kind: CompletionItemKind.Keyword, detail: 'Espera hasta que se cumpla una condición', type: 'control' },
     { label: 'INKEY$', kind: CompletionItemKind.Function, detail: 'Lee una tecla presionada' },
+
+    // Librerías de Boriel Basic
+    // Maths
+    { label: 'fSin', kind: CompletionItemKind.Function, detail: 'Seno rápido (menos preciso)', type: 'function', parameters: 'angle As Fixed', returnType: 'Fixed' },
+    { label: 'fCos', kind: CompletionItemKind.Function, detail: 'Coseno rápido (menos preciso)', type: 'function', parameters: 'angle As Fixed', returnType: 'Fixed' },
+    { label: 'fTan', kind: CompletionItemKind.Function, detail: 'Tangente rápida (menos preciso)', type: 'function', parameters: 'angle As Fixed', returnType: 'Fixed' },
+    { label: 'fSqrt', kind: CompletionItemKind.Function, detail: 'Raíz cuadrada rápida', type: 'function', parameters: 'value As Fixed', returnType: 'Fixed' },
+    { label: 'iSqrt', kind: CompletionItemKind.Function, detail: 'Raíz cuadrada entera', type: 'function', parameters: 'value As UInteger', returnType: 'UInteger' },
+    { label: 'distance', kind: CompletionItemKind.Function, detail: 'Calcula la distancia (Pitágoras)', type: 'function', parameters: 'x As Fixed, y As Fixed', returnType: 'Fixed' },
+
+    // Graphics
+    { label: 'attrAddress', kind: CompletionItemKind.Function, detail: 'Dirección de atributo para X,Y', type: 'function', parameters: 'x As UByte, y As UByte', returnType: 'UInteger' },
+    { label: 'clearBox', kind: CompletionItemKind.Keyword, detail: 'Limpia un área de la pantalla', type: 'function', parameters: 'x As UByte, y As UByte, w As UByte, h As UByte', returnType: 'void' },
+    { label: 'csrlin', kind: CompletionItemKind.Function, detail: 'Línea actual del cursor', type: 'function', parameters: '', returnType: 'UByte' },
+    { label: 'fastPlot', kind: CompletionItemKind.Keyword, detail: 'Plot rápido sin atributos', type: 'function', parameters: 'x As UInteger, y As UByte', returnType: 'void' },
+    { label: 'HRPrint', kind: CompletionItemKind.Keyword, detail: 'Impresión de alta resolución', type: 'function', parameters: 'x As UInteger, y As UByte, text As String', returnType: 'void' },
+    { label: 'HRPrintFast', kind: CompletionItemKind.Keyword, detail: 'Impresión de alta resolución rápida', type: 'function', parameters: 'x As UInteger, y As UByte, text As String', returnType: 'void' },
+    { label: 'hMirror', kind: CompletionItemKind.Function, detail: 'Espejo horizontal de un byte', type: 'function', parameters: 'value As UByte', returnType: 'UByte' },
+    { label: 'pos', kind: CompletionItemKind.Function, detail: 'Posición horizontal del cursor', type: 'function', parameters: '', returnType: 'UByte' },
+    { label: 'windowPaint', kind: CompletionItemKind.Keyword, detail: 'Pinta atributos en una ventana', type: 'function', parameters: 'x As UByte, y As UByte, w As UByte, h As UByte, attr As UByte', returnType: 'void' },
+    { label: 'putchars', kind: CompletionItemKind.Keyword, detail: 'Pone caracteres gráficos', type: 'function', parameters: 'x As UByte, y As UByte, w As UByte, h As UByte, address As UInteger', returnType: 'void' },
+    { label: 'scrAddress', kind: CompletionItemKind.Function, detail: 'Dirección de pantalla para X,Y', type: 'function', parameters: 'x As UByte, y As UByte', returnType: 'UInteger' },
+    { label: 'putTile', kind: CompletionItemKind.Keyword, detail: 'Pone un tile 2x2', type: 'function', parameters: 'x As UByte, y As UByte, tileIndex As UByte', returnType: 'void' },
+    { label: 'pixelScroll', kind: CompletionItemKind.Keyword, detail: 'Scroll de píxeles', type: 'function', parameters: 'lines As UByte', returnType: 'void' },
+    { label: 'windowScrollUP', kind: CompletionItemKind.Keyword, detail: 'Scroll de ventana hacia arriba', type: 'function', parameters: 'x As UByte, y As UByte, w As UByte, h As UByte', returnType: 'void' },
+    { label: 'windowAttrScrollUP', kind: CompletionItemKind.Keyword, detail: 'Scroll de atributos de ventana hacia arriba', type: 'function', parameters: 'x As UByte, y As UByte, w As UByte, h As UByte', returnType: 'void' },
+
+    // Text Handling
+    { label: 'asc', kind: CompletionItemKind.Function, detail: 'Código ASCII (compatible FreeBasic)', type: 'function', parameters: 'char As String', returnType: 'UByte' },
+    { label: 'doubleSizePrint', kind: CompletionItemKind.Keyword, detail: 'Impresión de doble tamaño', type: 'function', parameters: 'text As String', returnType: 'void' },
+    { label: 'propPrint', kind: CompletionItemKind.Keyword, detail: 'Impresión proporcional', type: 'function', parameters: 'text As String', returnType: 'void' },
+    { label: 'print42', kind: CompletionItemKind.Keyword, detail: 'Impresión de 42 columnas', type: 'function', parameters: 'text As String', returnType: 'void' },
+    { label: 'print64', kind: CompletionItemKind.Keyword, detail: 'Impresión de 64 columnas', type: 'function', parameters: 'text As String', returnType: 'void' },
+    { label: 'Print64x32', kind: CompletionItemKind.Keyword, detail: 'Impresión de 64x32 caracteres', type: 'function', parameters: 'text As String', returnType: 'void' },
+
+    // Memory Banking
+    { label: 'SetBank', kind: CompletionItemKind.Keyword, detail: 'Establece el banco de memoria en $C000', type: 'function', parameters: 'bank As UByte', returnType: 'void' },
+    { label: 'GetBank', kind: CompletionItemKind.Function, detail: 'Obtiene el banco actual en $C000', type: 'function', parameters: '', returnType: 'UByte' },
+    { label: 'SetCodeBank', kind: CompletionItemKind.Keyword, detail: 'Copia banco a $8000', type: 'function', parameters: 'bank As UByte', returnType: 'void' },
+
+    // Compression
+    { label: 'megaLZDepack', kind: CompletionItemKind.Keyword, detail: 'Descompresión MegaLZ', type: 'function', parameters: 'source As UInteger, dest As UInteger', returnType: 'void' },
+    { label: 'zx0', kind: CompletionItemKind.Keyword, detail: 'Descompresión ZX0', type: 'function', parameters: 'source As UInteger, dest As UInteger', returnType: 'void' },
+
+    // Keys
+    { label: 'GetKey', kind: CompletionItemKind.Function, detail: 'Obtiene la tecla pulsada', type: 'function', parameters: '', returnType: 'String' },
+    { label: 'GetKeyScanCode', kind: CompletionItemKind.Function, detail: 'Obtiene el scancode de la tecla', type: 'function', parameters: '', returnType: 'UByte' },
+    { label: 'MultiKeys', kind: CompletionItemKind.Function, detail: 'Detecta múltiples teclas', type: 'function', parameters: 'key1 As UByte, key2 As UByte', returnType: 'UByte' },
+
+    // Other / User Requested
+    { label: 'MemCopy', kind: CompletionItemKind.Keyword, detail: 'Copia bloque de memoria', type: 'function', parameters: 'source As UInteger, dest As UInteger, length As UInteger', returnType: 'void' },
 ];
 
 module.exports = {

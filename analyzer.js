@@ -11,6 +11,37 @@ const globalVariables = new Map(); // { nombre: Location }
 
 const { URI } = require('vscode-uri');
 
+// Registrar definiciones builtin (funciones integradas) aquí para que
+// estén disponibles en hover/completion/definition incluso si no existen
+// en los archivos del proyecto.
+const builtinPaintDataUri = 'builtin://paintData';
+globalDefinitions.set('paintData', {
+    uri: builtinPaintDataUri,
+    range: {
+        start: { line: 0, character: 0 },
+        end: { line: 0, character: 0 }
+    },
+    type: 'SUB',
+    name: 'paintData',
+    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, address as uInteger',
+    returnType: 'void',
+    header: 'SUB paintData(x as uByte, y as uByte, width as uByte, height as uByte, address as uInteger)',
+    doc: `
+paintData: dibuja datos en pantalla desde la dirección indicada.
+
+Parámetros:
+- x (uByte): coordenada X de inicio.
+- y (uByte): coordenada Y de inicio.
+- width (uByte): ancho del bloque.
+- height (uByte): alto del bloque.
+- address (uInteger): dirección en memoria donde están los datos.
+
+Ejemplo:
+    ' Dibuja un bloque usando datos en 32768
+    paintData(10, 20, 16, 16, 32768)
+`,
+});
+
 // Obtener la ruta del proyecto desde los argumentos
 const projectPath = process.argv[2]; // La ruta del proyecto se pasa como argumento al servidor
 

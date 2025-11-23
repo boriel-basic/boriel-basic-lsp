@@ -118,6 +118,75 @@ connection.onReferences((params) => {
     return [];
 });
 
+// Manejar solicitud de información al pasar el mouse (Hover)
+connection.onHover((params) => {
+    const position = params.position;
+    const document = documents.get(params.textDocument.uri);
+    if (!document) {
+        return null;
+    }
+
+    const lineText = document.getText({
+        start: { line: position.line, character: 0 },
+        end: { line: position.line, character: Number.MAX_SAFE_INTEGER }
+    });
+
+    // Encontrar la palabra en la posición del cursor
+    // Usamos una regex que incluya caracteres válidos para identificadores
+    const wordRegex = /[a-zA-Z0-9_$]+/g;
+    let match;
+    let wordAtPosition = null;
+
+    while ((match = wordRegex.exec(lineText)) !== null) {
+        const startIndex = match.index;
+        const endIndex = startIndex + match[0].length;
+        if (position.character >= startIndex && position.character <= endIndex) {
+            wordAtPosition = match[0];
+            break;
+        }
+    }
+
+    if (!wordAtPosition) {
+        return null;
+    }
+
+    // Priorizar definiciones globales (incluye builtins)
+    if (globalDefinitions.has(wordAtPosition)) {
+        const def = globalDefinitions.get(wordAtPosition);
+        const headerText = def.header || wordAtPosition;
+        const docText = def.doc || '';
+
+        const contents = {
+            kind: 'markdown',
+            // Mostrar la cabecera como bloque de código basic para que el cliente
+            // intente aplicar resaltado de sintaxis si lo soporta.
+            value: '\n\n```basic\n' + headerText + '\n```\n\n' + docText
+        };
+
+        return { contents };
+    }
+
+    // Si no es una definición global, buscar en las palabras clave de Boriel Basic
+    const keyword = borielBasicKeywords.find(k => k.label.toUpperCase() === wordAtPosition.toUpperCase());
+
+    if (keyword) {
+        let signature = '';
+        if (keyword.type === 'function' && keyword.parameters) {
+            signature = `\`${keyword.label}(${keyword.parameters}) -> ${keyword.returnType || 'void'}\`\n\n`;
+        } else if (keyword.type === 'function') {
+            signature = `\`${keyword.label}() -> ${keyword.returnType || 'void'}\`\n\n`;
+        }
+
+        const contents = {
+            kind: 'markdown',
+            value: `**${keyword.label}**\n\n${signature}${keyword.detail}`
+        };
+        return { contents };
+    }
+
+    return null;
+});
+
 // Inicialización del servidor
 connection.onInitialize((params) => {
     // Recoger las opciones de inicialización
@@ -222,8 +291,8 @@ connection.onCompletion(() => {
     // Retornar las palabras clave, funciones y variables como sugerencias de autocompletado
     const keywordCompletions = borielBasicKeywords.map(keyword => ({
         label: toPascalCase(keyword.label),
-        kind: CompletionItemKind.Keyword,
-        detail: keyword.detail
+        kind: keyword.kind || CompletionItemKind.Keyword,
+        detail: keyword.parameters ? `${keyword.detail}\n(${keyword.parameters})` : keyword.detail
     }));
 
     return [...keywordCompletions, ...functionCompletions, ...variableCompletions];
@@ -265,17 +334,34 @@ connection.onSignatureHelp((params) => {
     console.log(`Buscando firma para la función: ${funcName}`);
 
     // Buscar la función en las definiciones globales
-    const funcData = globalDefinitions.get(funcName);
+    let funcData = globalDefinitions.get(funcName);
+    let isUserDefined = true;
+
+    if (!funcData) {
+        // Buscar en las palabras clave de Boriel Basic
+        const keyword = borielBasicKeywords.find(k => k.label.toUpperCase() === funcName.toUpperCase() && k.type === 'function');
+        if (keyword) {
+            funcData = {
+                parameters: keyword.parameters || '',
+                returnType: keyword.returnType || 'void',
+                detail: keyword.detail
+            };
+            isUserDefined = false;
+        }
+    }
+
     if (!funcData) {
         console.log(`No se encontró la función: ${funcName}`);
         return null;
     }
 
     // Crear la respuesta de ayuda de firma
-    const parameters = funcData.parameters.split(',').map(param => param.trim());
+    const parameters = funcData.parameters ? funcData.parameters.split(',').map(param => param.trim()) : [];
     const signature = {
         label: `${funcName}(${funcData.parameters}) -> ${funcData.returnType}`,
-        documentation: `Función definida por el usuario.\n\nRetorna: ${funcData.returnType}`,
+        documentation: isUserDefined
+            ? `Función definida por el usuario.\n\nRetorna: ${funcData.returnType}`
+            : `${funcData.detail}\n\nRetorna: ${funcData.returnType}`,
         parameters: parameters.map(param => ({
             label: param,
             documentation: `Parámetro: ${param}`
@@ -428,7 +514,12 @@ connection.languages.semanticTokens.on((params) => {
 
         words.forEach((word, wordIndex) => {
             // Eliminar paréntesis y su contenido del nombre
-            word = word.replace(/\([^()]*\)$/, '');
+            // Si la palabra contiene un paréntesis de apertura, nos quedamos con lo que hay antes
+            if (word.includes('(')) {
+                word = word.split('(')[0];
+            }
+            // También limpiar paréntesis de cierre si quedaron (por si acaso)
+            word = word.replace(/\)/g, '');
             const startChar = line.indexOf(word, wordIndex > 0 ? line.indexOf(words[wordIndex - 1]) + words[wordIndex - 1].length : 0);
             const length = word.length;
 
@@ -509,6 +600,7 @@ function getTokenType(type) {
         case 'type': return 4; // 'type'
         case 'definition': return 5; // 'definition'
         case 'io': return 6; // 'io'
+        case 'function': return 1; // 'function'
         case 'keyword': return 0; // 'keyword'
         default: return 0; // Default to 'keyword'
     }
