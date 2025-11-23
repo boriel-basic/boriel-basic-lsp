@@ -91,6 +91,13 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
                 console.log('No se incrementa la indentación para "Do Loop" en una sola línea.');
                 return;
             }
+
+            // Excepción: "WHILE ... WEND" en la misma línea no incrementa indentación
+            if (/^\s*WHILE\b/i.test(trimmedLine) && /\bWEND\b/i.test(trimmedLine)) {
+                console.log('No se incrementa la indentación para "WHILE ... WEND" en una sola línea.');
+                return;
+            }
+
             // Si es un "IF ... THEN" con más contenido en la misma línea, no incrementar
             if (/^\s*(?!#IFDEF|#IFNDEF)\bIF\b.+\bTHEN\b.+$/i.test(trimmedLine)) {
                 console.log(`No se incrementa la indentación para la línea: "${trimmedLine}"`);
