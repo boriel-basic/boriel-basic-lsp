@@ -30,6 +30,13 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
             indentLevel = Math.max(0, indentLevel - 1);
         }
 
+        // Ajustar indentación para llaves de cierre (arrays)
+        const openBraces = (trimmedLine.match(/{/g) || []).length;
+        const closeBraces = (trimmedLine.match(/}/g) || []).length;
+        if (closeBraces > openBraces) {
+            indentLevel = Math.max(0, indentLevel - (closeBraces - openBraces));
+        }
+
         // Manejar bloques ELSE y ELSEIF
         if (/^\s*(ELSE|ELSEIF|#ELSE\b.*)\b/i.test(trimmedLine)) {
             const elseExpectedIndent = ' '.repeat(Math.max(0, (indentLevel - 1) * indentSize));
@@ -37,13 +44,26 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
 
             // Convertir palabras clave a Pascal Case si la opción está habilitada
             if (options.formatKeywords) {
-                formattedElseLine = formattedElseLine.replace(/[\w\$]+/g, (word) => {
+                // Separar comentario del código
+                const commentMatch = formattedElseLine.match(/(?:REM\b|')/i);
+                let codePart = formattedElseLine;
+                let commentPart = '';
+
+                if (commentMatch) {
+                    const commentIndex = formattedElseLine.indexOf(commentMatch[0]);
+                    codePart = formattedElseLine.substring(0, commentIndex);
+                    commentPart = formattedElseLine.substring(commentIndex);
+                }
+
+                codePart = codePart.replace(/[\w\$]+/g, (word) => {
                     const pascalWord = keywordsSet.has(word.toUpperCase())
                         ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
                         : word;
                     console.log(`Palabra formateada: "${word}" -> "${pascalWord}"`);
                     return pascalWord;
                 });
+
+                formattedElseLine = codePart + commentPart;
             }
 
             const finalElseLine = elseExpectedIndent + formattedElseLine;
@@ -64,13 +84,26 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
 
         // Convertir palabras clave a Pascal Case si la opción está habilitada
         if (options.formatKeywords) {
-            formattedLine = formattedLine.replace(/[\w\$]+/g, (word) => {
+            // Separar comentario del código
+            const commentMatch = formattedLine.match(/(?:REM\b|')/i);
+            let codePart = formattedLine;
+            let commentPart = '';
+
+            if (commentMatch) {
+                const commentIndex = formattedLine.indexOf(commentMatch[0]);
+                codePart = formattedLine.substring(0, commentIndex);
+                commentPart = formattedLine.substring(commentIndex);
+            }
+
+            codePart = codePart.replace(/[\w\$]+/g, (word) => {
                 const pascalWord = keywordsSet.has(word.toUpperCase())
                     ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
                     : word;
                 console.log(`Palabra formateada: "${word}" -> "${pascalWord}"`);
                 return pascalWord;
             });
+
+            formattedLine = codePart + commentPart;
         }
 
         // Reconstruir la línea con la indentación original o esperada
@@ -107,6 +140,11 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
             if (trimmedLine.includes(':WEND\n')) return
 
             indentLevel++;
+        }
+
+        // Aumentar indentación para llaves de apertura (arrays)
+        if (openBraces > closeBraces) {
+            indentLevel += (openBraces - closeBraces);
         }
     });
 

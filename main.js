@@ -304,19 +304,20 @@ connection.languages.semanticTokens.on((params) => {
         let currentCharIndex = 0;
 
         // Detectar comentarios
+        let commentToken = null;
         const commentMatch = line.match(/(?:REM\b|')\s*(.*)/i);
         if (commentMatch) {
             const commentStart = line.indexOf(commentMatch[0]);
-            tokens.push({
+            commentToken = {
                 line: lineIndex,
                 startChar: commentStart,
                 length: line.length - commentStart,
                 tokenType: 5, // 'comment'
                 tokenModifiers: []
-            });
+            };
 
-            // No procesar más tokens en esta línea después de un comentario
-            return;
+            // Truncar la línea para no procesar el comentario como código
+            remainingLine = line.substring(0, commentStart);
         }
 
         // Detectar tokens compuestos
@@ -475,6 +476,11 @@ connection.languages.semanticTokens.on((params) => {
                     typeIndex = remainingLine.toUpperCase().indexOf(typeKeyword.label.toUpperCase(), typeIndex + typeKeyword.label.length);
                 }
             });
+
+        // Agregar el token de comentario al final, si existe
+        if (commentToken) {
+            tokens.push(commentToken);
+        }
     });
 
     // Convertir los tokens al formato esperado
