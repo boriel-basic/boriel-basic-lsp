@@ -1,0 +1,32 @@
+[
+    {
+        "name": "paintData",
+        "parameters": "x as uByte, y as uByte, width as uByte, height as uByte, address as uInteger",
+        "doc": "\npaintData: dibuja datos en pantalla desde la dirección indicada.\n\nParámetros:\n- x (uByte): coordenada X de inicio.\n- y (uByte): coordenada Y de inicio.\n- width (uByte): ancho del bloque.\n- height (uByte): alto del bloque.\n- address (uInteger): dirección en memoria donde están los datos.\n\nEjemplo:\n    ' Dibuja un bloque usando datos en 32768\n    paintData(10, 20, 16, 16, 32768)\n"
+    },
+    {
+        "name": "putChars",
+        "parameters": "x as uByte, y as uByte, width as uByte, height as uByte, dataAddress as uInteger",
+        "doc": "\nputChars: Fills a rectangle region of the screen width a char\n\nParameters:\n- x (uByte): x coordinate (cell column)\n- y (uByte): y coordinate (cell row)\n- width (uByte): width (number of columns)\n- height (uByte): height (number of rows)\n- dataAddress (uInteger): Chars bytes address\n"
+    },
+    {
+        "name": "getChars",
+        "parameters": "x as uByte, y as uByte, width as uByte, height as uByte, dataAddress as uInteger",
+        "doc": "\ngetChars: Gets a rectangle region of the screen into many chars (opposite of putChars)\n\nParameters:\n- x (uByte): x coordinate (cell column)\n- y (uByte): y coordinate (cell row)\n- width (uByte): width (number of columns)\n- height (uByte): height (number of rows)\n- dataAddress (uInteger): Chars bytes address\n"
+    },
+    {
+        "name": "paint",
+        "parameters": "x as uByte, y as uByte, width as uByte, height as uByte, attribute as uByte",
+        "doc": "\npaint: Fills a rectangle region of the screen width a color\n\nParameters:\n- x (uByte): x coordinate (cell column)\n- y (uByte): y coordinate (cell row)\n- width (uByte): width (number of columns)\n- height (uByte): height (number of rows)\n- attribute (uByte): byte-encoded attr\n"
+    },
+    {
+        "name": "getPaintData",
+        "parameters": "x as uByte, y as uByte, width as uByte, height as uByte, address as uInteger",
+        "doc": "\ngetPaintData: Gets the colors of a rectangle region of the screen into memory (opposite of paintData)\n\nParameters:\n- x (uByte): x coordinate (cell column)\n- y (uByte): y coordinate (cell row)\n- width (uByte): width (number of columns)\n- height (uByte): height (number of rows)\n- address (uInteger): address of the byte-encoded attr sequence\n"
+    },
+    {
+        "name": "putCharsOverMode",
+        "parameters": "x as uByte, y as uByte, width as uByte, height as uByte, overMode as uByte, dataAddress as uInteger",
+        "doc": "\nputCharsOverMode: Fills a rectangle region of the screen width a char\n\nParameters:\n- x (uByte): x coordinate (cell column)\n- y (uByte): y coordinate (cell row)\n- width (uByte): width (number of columns)\n- height (uByte): height (number of rows)\n- overMode (uByte): the way the characters are combined with the background.\n    - 0: the characters are simply replaced.\n    - 1: the characters are combined with an Exclusive OR (XOR).\n    - 2: the characters are combined using an AND function.\n    - 3: the characters are combined using an OR function.\n- dataAddress (uInteger): Chars bytes address\n"
+    }
+]

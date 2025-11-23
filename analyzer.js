@@ -14,157 +14,23 @@ const { URI } = require('vscode-uri');
 // Registrar definiciones builtin (funciones integradas) aquí para que
 // estén disponibles en hover/completion/definition incluso si no existen
 // en los archivos del proyecto.
-const builtinPaintDataUri = 'builtin://paintData';
-globalDefinitions.set('paintData', {
-    uri: builtinPaintDataUri,
-    range: {
-        start: { line: 0, character: 0 },
-        end: { line: 0, character: 0 }
-    },
-    type: 'SUB',
-    name: 'paintData',
-    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, address as uInteger',
-    returnType: 'void',
-    header: 'SUB paintData(x as uByte, y as uByte, width as uByte, height as uByte, address as uInteger)',
-    doc: `
-paintData: dibuja datos en pantalla desde la dirección indicada.
+const builtinDefinitions = require('./functionsDefinitions.json');
 
-Parámetros:
-- x (uByte): coordenada X de inicio.
-- y (uByte): coordenada Y de inicio.
-- width (uByte): ancho del bloque.
-- height (uByte): alto del bloque.
-- address (uInteger): dirección en memoria donde están los datos.
-
-Ejemplo:
-    ' Dibuja un bloque usando datos en 32768
-    paintData(10, 20, 16, 16, 32768)
-`,
-});
-
-const builtinPutCharsUri = 'builtin://putChars';
-globalDefinitions.set('putChars', {
-    uri: builtinPutCharsUri,
-    range: {
-        start: { line: 0, character: 0 },
-        end: { line: 0, character: 0 }
-    },
-    type: 'SUB',
-    name: 'putChars',
-    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, dataAddress as uInteger',
-    returnType: 'void',
-    header: 'SUB putChars(x as uByte, y as uByte, width as uByte, height as uByte, dataAddress as uInteger)',
-    doc: `
-putChars: Fills a rectangle region of the screen width a char
-
-Parameters:
-- x (uByte): x coordinate (cell column)
-- y (uByte): y coordinate (cell row)
-- width (uByte): width (number of columns)
-- height (uByte): height (number of rows)
-- dataAddress (uInteger): Chars bytes address
-`,
-});
-
-const builtinGetCharsUri = 'builtin://getChars';
-globalDefinitions.set('getChars', {
-    uri: builtinGetCharsUri,
-    range: {
-        start: { line: 0, character: 0 },
-        end: { line: 0, character: 0 }
-    },
-    type: 'SUB',
-    name: 'getChars',
-    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, dataAddress as uInteger',
-    returnType: 'void',
-    header: 'SUB getChars(x as uByte, y as uByte, width as uByte, height as uByte, dataAddress as uInteger)',
-    doc: `
-getChars: Gets a rectangle region of the screen into many chars (opposite of putChars)
-
-Parameters:
-- x (uByte): x coordinate (cell column)
-- y (uByte): y coordinate (cell row)
-- width (uByte): width (number of columns)
-- height (uByte): height (number of rows)
-- dataAddress (uInteger): Chars bytes address
-`,
-});
-
-const builtinPaintUri = 'builtin://paint';
-globalDefinitions.set('paint', {
-    uri: builtinPaintUri,
-    range: {
-        start: { line: 0, character: 0 },
-        end: { line: 0, character: 0 }
-    },
-    type: 'SUB',
-    name: 'paint',
-    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, attribute as uByte',
-    returnType: 'void',
-    header: 'SUB paint(x as uByte, y as uByte, width as uByte, height as uByte, attribute as uByte)',
-    doc: `
-paint: Fills a rectangle region of the screen width a color
-
-Parameters:
-- x (uByte): x coordinate (cell column)
-- y (uByte): y coordinate (cell row)
-- width (uByte): width (number of columns)
-- height (uByte): height (number of rows)
-- attribute (uByte): byte-encoded attr
-`,
-});
-
-const builtinGetPaintDataUri = 'builtin://getPaintData';
-globalDefinitions.set('getPaintData', {
-    uri: builtinGetPaintDataUri,
-    range: {
-        start: { line: 0, character: 0 },
-        end: { line: 0, character: 0 }
-    },
-    type: 'SUB',
-    name: 'getPaintData',
-    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, address as uInteger',
-    returnType: 'void',
-    header: 'SUB getPaintData(x as uByte, y as uByte, width as uByte, height as uByte, address as uInteger)',
-    doc: `
-getPaintData: Gets the colors of a rectangle region of the screen into memory (opposite of paintData)
-
-Parameters:
-- x (uByte): x coordinate (cell column)
-- y (uByte): y coordinate (cell row)
-- width (uByte): width (number of columns)
-- height (uByte): height (number of rows)
-- address (uInteger): address of the byte-encoded attr sequence
-`,
-});
-
-const builtinPutCharsOverModeUri = 'builtin://putCharsOverMode';
-globalDefinitions.set('putCharsOverMode', {
-    uri: builtinPutCharsOverModeUri,
-    range: {
-        start: { line: 0, character: 0 },
-        end: { line: 0, character: 0 }
-    },
-    type: 'SUB',
-    name: 'putCharsOverMode',
-    parameters: 'x as uByte, y as uByte, width as uByte, height as uByte, overMode as uByte, dataAddress as uInteger',
-    returnType: 'void',
-    header: 'SUB putCharsOverMode(x as uByte, y as uByte, width as uByte, height as uByte, overMode as uByte, dataAddress as uInteger)',
-    doc: `
-putCharsOverMode: Fills a rectangle region of the screen width a char
-
-Parameters:
-- x (uByte): x coordinate (cell column)
-- y (uByte): y coordinate (cell row)
-- width (uByte): width (number of columns)
-- height (uByte): height (number of rows)
-- overMode (uByte): the way the characters are combined with the background.
-    - 0: the characters are simply replaced.
-    - 1: the characters are combined with an Exclusive OR (XOR).
-    - 2: the characters are combined using an AND function.
-    - 3: the characters are combined using an OR function.
-- dataAddress (uInteger): Chars bytes address
-`,
+builtinDefinitions.forEach(def => {
+    const uri = `builtin://${def.name}`;
+    globalDefinitions.set(def.name, {
+        uri: uri,
+        range: {
+            start: { line: 0, character: 0 },
+            end: { line: 0, character: 0 }
+        },
+        type: 'SUB',
+        name: def.name,
+        parameters: def.parameters,
+        returnType: def.returnType || 'void',
+        header: def.header || `SUB ${def.name}(${def.parameters})`,
+        doc: def.doc
+    });
 });
 
 // Obtener la ruta del proyecto desde los argumentos
