@@ -1,0 +1,19 @@
+[
+    {
+        "name": "attr",
+        "parameters": "byval row as ubyte, byval col as ubyte",
+        "returnType": "ubyte",
+        "doc": "\nfunction ATTR\n\nParameters:\n    row: screen row\n    col: screen column\n\nReturns:\n    a byte value containing the screen attribute color value\n"
+    },
+    {
+        "name": "setattr",
+        "parameters": "byval row as ubyte, byval col as ubyte, byval value as ubyte",
+        "doc": "\nsub SETATTR\n\nParameters:\n    row: screen row\n    col: screen column\n    color: 8bit color attribute\n\nAction: Sets the attribute of screen(row, column) to the given\n        color attribute value.\n"
+    },
+    {
+        "name": "attraddr",
+        "parameters": "byval row as ubyte, byval col as ubyte",
+        "returnType": "uinteger",
+        "doc": "\nfunction fastcall ATTRADDR\n\nParameters:\n    row: screen row\n    col: screen column\n\nAction: Gets the attribute address of screen(row, column)\n"
+    }
+]

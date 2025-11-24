@@ -1,0 +1,22 @@
+[
+    {
+        "name": "ScrollRight",
+        "parameters": "x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte",
+        "doc": "\nsub fastcall ScrollRight\n\npixel by pixel right scroll\nscrolls 1 pixel right the window defined by (x1, y1, x2, y2)\n"
+    },
+    {
+        "name": "ScrollLeft",
+        "parameters": "x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte",
+        "doc": "\nsub fastcall ScrolLeft\n\npixel by pixel left scroll\nscrolls 1 pixel left the window defined by (x1, y1, x2, y2)\n"
+    },
+    {
+        "name": "ScrollUp",
+        "parameters": "x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte",
+        "doc": "\nsub fastcall ScrolUp\n\npixel by pixel up scroll\nscrolls 1 pixel up the window defined by (x1, y1, x2, y2)\n"
+    },
+    {
+        "name": "ScrollDown",
+        "parameters": "x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte",
+        "doc": "\nsub fastcall ScrolDown\n\npixel by pixel down scroll\nscrolls 1 pixel down the window defined by (x1, y1, x2, y2)\n"
+    }
+]

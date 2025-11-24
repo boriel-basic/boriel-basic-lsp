@@ -1,0 +1,8 @@
+[
+    {
+        "name": "screen",
+        "parameters": "byval row as ubyte, byval col as ubyte",
+        "returnType": "string",
+        "doc": "\nfunction fastcall SCREEN\n\nParameters:\n    row: screen row\n    col: screen column\n\nReturns:\n    a string containing the screen char value\n"
+    }
+]

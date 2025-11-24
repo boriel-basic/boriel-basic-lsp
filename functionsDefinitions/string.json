@@ -1,0 +1,90 @@
+[
+    {
+        "name": "mid",
+        "parameters": "ByVal s$ as String, ByVal x As Uinteger, ByVal n As Uinteger",
+        "returnType": "String",
+        "doc": "\nfunction mid$(A$, <from>, <len>)\n\nReturns:\n\tSubstring starting at <from>, with <len> chars.\n"
+    },
+    {
+        "name": "left",
+        "parameters": "ByVal s$ as String, ByVal n As Uinteger",
+        "returnType": "String",
+        "doc": "\nfunction Left$(A$, <len>)\n\nReturns:\n  The first <len> chars of the given string.\n"
+    },
+    {
+        "name": "right",
+        "parameters": "ByVal s$ as String, ByVal n As Uinteger",
+        "returnType": "String",
+        "doc": "\nfunction Right$(A$, <len>)\n\nReturns:\n  The last <len> chars of the given string.\n"
+    },
+    {
+        "name": "strpos2",
+        "parameters": "ByRef a$ as String, ByRef b$ As String",
+        "returnType": "Uinteger",
+        "doc": "\nfunction strpos2(A$, b$)\n\nUnlike strpos, parameters must be Variables, not expressions.\nThis way it requires less memory (heap) and it's faster\n\nReturns:\n  The position of b$ in A$\n  If b$ is not in A$, it will return a value greater than\n  LEN(a$)\n"
+    },
+    {
+        "name": "strpos",
+        "parameters": "ByVal a$ as String, ByVal b$ as String",
+        "returnType": "Uinteger",
+        "doc": "\nfunction strpos(A$, b$)\n\nReturns:\n  The position of b$ in A$\n  If b$ is not in A$, it will return a value greater than\n  LEN(a$)\n"
+    },
+    {
+        "name": "inStr",
+        "parameters": "ByVal a$ as String, ByVal b$ as String",
+        "returnType": "byte",
+        "doc": "\nfunction instr(A$, b$)\n\nReturns:\n  0 if b$ not in a$\n  other value if b$ is in a$\n"
+    },
+    {
+        "name": "ucase2",
+        "parameters": "ByRef s$ As String",
+        "doc": "\nSub Ucase2(ByRef b$)\n\n- Converts the content of b$ to uppercase\n"
+    },
+    {
+        "name": "ucase",
+        "parameters": "ByVal s$ as String",
+        "returnType": "String",
+        "doc": "\nfunction Ucase(ByVal b$)\n\n- Returns a copy of b$ converted to uppercase\n"
+    },
+    {
+        "name": "lcase2",
+        "parameters": "ByRef s$ as String",
+        "doc": "\nSub Lcase2(ByRef b$)\n\n- Converts the content of b$ to lowercase\n"
+    },
+    {
+        "name": "lcase",
+        "parameters": "ByVal s$ as String",
+        "returnType": "String",
+        "doc": "\nfunction Lcase(ByVal b$)\n\n- Returns a copy of b$ converted to lowercase\n"
+    },
+    {
+        "name": "ltrim",
+        "parameters": "ByVal s$ as String, ByVal rep$ as String",
+        "returnType": "String",
+        "doc": "\nfunction ltrim(ByVal s$, rep$)\n\nReturns a copy of s$, removing all occurrences of rep$ on the\nleft side (beginning) of s$. For example:\nltrim(\": Hello world\", \": \") returns \"Hello World\"\n"
+    },
+    {
+        "name": "rtrim",
+        "parameters": "ByVal s$ as String, ByVal rep$ as String",
+        "returnType": "String",
+        "doc": "\nfunction rtrim(ByVal s$, rep$)\n\nReturns a copy of s$, removing all occurrences of rep$ on the\nright side (ending) of s$. For example:\nrtrim(\"Hello world. \", \". \") returns \"Hello World\"\n"
+    },
+    {
+        "name": "trim",
+        "parameters": "ByVal s$ as String, ByVal rep$ as String",
+        "returnType": "String",
+        "doc": "\nfunction trim(ByVal s$, rep$)\n\nReturns a copy of s$, removing all occurrences of rep$ on the\nleft and right side (ending) of s$. For example:\nrtrim(\";.;.Hello world;.;.\", \";.\") returns \"Hello World\"\n"
+    },
+    {
+        "name": "isdigit",
+        "parameters": "ByVal s$ as String",
+        "returnType": "ubyte",
+        "doc": "\nfunction isdigit(ByVal s$)\n\nReturns not 0 if the first element of s$ is a digit,\nor 0 otherwise.\nFor example:\nisdigit(\"a\") returns 0, isdigit(\"2\") returns 1\n"
+    },
+    {
+        "name": "isletter",
+        "parameters": "ByVal s$ as String",
+        "returnType": "ubyte",
+        "doc": "\nfunction isletter(ByVal s$)\n\nReturns not 0 if the first element of s$ is a letter,\nor 0 otherwise.\nFor example:\nisletter(\"0\") returns 0, isletter(\"a\") returns 1\n"
+    }
+]

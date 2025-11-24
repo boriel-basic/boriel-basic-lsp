@@ -1,0 +1,22 @@
+[
+    {
+        "name": "WinScrollRight",
+        "parameters": "row as uByte, col as uByte, width as Ubyte, height as Ubyte",
+        "doc": "\nsub fastcall WinScrollRight\n\nscrolls the window defined by (row, col, width, height) 1 cell right\n"
+    },
+    {
+        "name": "WinScrollLeft",
+        "parameters": "row as uByte, col as uByte, width as Ubyte, height as Ubyte",
+        "doc": "\nsub fastcall WinScrollLeft\n\nscrolls the window defined by (row, col, width, height) 1 cell left\n"
+    },
+    {
+        "name": "WinScrollUp",
+        "parameters": "row as uByte, col as uByte, width as Ubyte, height as Ubyte",
+        "doc": "\nsub fastcall WinScrollUp\n\nscrolls the window defined by (row, col, width, height) 1 cell up\n"
+    },
+    {
+        "name": "WinScrollDown",
+        "parameters": "row as uByte, col as uByte, width as Ubyte, height as Ubyte",
+        "doc": "\nsub fastcall WinScrollDown\n\nscrolls the window defined by (row, col, width, height) 1 cell down\n"
+    }
+]

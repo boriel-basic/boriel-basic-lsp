@@ -1,0 +1,8 @@
+[
+    {
+        "name": "input",
+        "parameters": "MaxLen AS UINTEGER",
+        "returnType": "STRING",
+        "doc": "\nFUNCTION input(MaxLen AS UINTEGER) AS STRING\n\nSimple INPUT routine (not as powerful as Sinclair BASIC's).\nUsage: A$ = INPUT(MaxChars)\n"
+    }
+]

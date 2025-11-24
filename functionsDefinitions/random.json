@@ -1,0 +1,20 @@
+[
+    {
+        "name": "randInt",
+        "parameters": "",
+        "returnType": "ULong",
+        "doc": "\nfunction fastcall randInt() as ULong\n\nReturns a random ULong\n"
+    },
+    {
+        "name": "randFixed",
+        "parameters": "",
+        "returnType": "Fixed",
+        "doc": "\nFunction fastcall randFixed() as Fixed\n\nReturns a random Fixed\n"
+    },
+    {
+        "name": "randomLimit",
+        "parameters": "limit as uByte",
+        "returnType": "uByte",
+        "doc": "\nFunction fastcall randomLimit(limit as uByte) as uByte\n"
+    }
+]
