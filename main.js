@@ -177,9 +177,9 @@ connection.onHover((params) => {
 
         const contents = {
             kind: 'markdown',
-            // Mostrar la cabecera como bloque de código basic para que el cliente
-            // intente aplicar resaltado de sintaxis si lo soporta.
-            value: '\n\n```basic\n' + headerText + '\n```\n\n' + docText
+            // Mostrar la cabecera como bloque de código freebasic para que el cliente
+            // aplique resaltado de sintaxis (FreeBasic es el más similar a Boriel Basic)
+            value: '\n\n```freebasic\n' + headerText + '\n```\n\n' + docText
         };
 
         return { contents };
