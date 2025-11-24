@@ -170,6 +170,19 @@ const borielBasicKeywords = [
     { label: 'MemCopy', kind: CompletionItemKind.Keyword, detail: 'Copia bloque de memoria', type: 'function', parameters: 'source As UInteger, dest As UInteger, length As UInteger', returnType: 'void' },
 ];
 
+// Import library function definitions and add them to keywords
+const libraryDefinitions = require('./functionsDefinitions');
+libraryDefinitions.forEach(def => {
+    borielBasicKeywords.push({
+        label: def.name,
+        kind: CompletionItemKind.Function,
+        detail: def.doc ? def.doc.split('\n')[1] || 'Library function' : 'Library function',
+        type: 'function',
+        parameters: def.parameters || '',
+        returnType: def.returnType || 'void'
+    });
+});
+
 module.exports = {
     borielBasicKeywords
 };
