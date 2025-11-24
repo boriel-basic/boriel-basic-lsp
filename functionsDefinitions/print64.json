@@ -1,0 +1,12 @@
+[
+    {
+        "name": "printat64",
+        "parameters": "y as uByte, x as uByte",
+        "doc": "\nSUB printat64 (y as uByte, x as uByte)\n\nChanges print coordinates for 64-column mode\n"
+    },
+    {
+        "name": "print64",
+        "parameters": "characters$ as String",
+        "doc": "\nSUB print64 (characters$ as String)\n\nPrint given string at current position in 64-column mode\n"
+    }
+]

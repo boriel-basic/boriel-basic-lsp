@@ -1,0 +1,27 @@
+[
+    {
+        "name": "printFzxSetFontAddr",
+        "parameters": "addr as Uinteger",
+        "doc": "\nsub fastcall printFzxSetFontAddr(addr as Uinteger)\n\nSets the FZX font address\n"
+    },
+    {
+        "name": "printFzxSetMargin",
+        "parameters": "margin as ubyte",
+        "doc": "\nsub fastcall printFzxSetMargin(margin as ubyte)\n\nSets the left margin for FZX printing\n"
+    },
+    {
+        "name": "printFzxAt",
+        "parameters": "row as Ubyte, col as Ubyte",
+        "doc": "\nsub fastcall printFzxAt(row as Ubyte, col as Ubyte)\n\nSets the print position for FZX printing\n"
+    },
+    {
+        "name": "printFzxStr",
+        "parameters": "s as String",
+        "doc": "\nsub printFzxStr(s as String)\n\nPrints a string using FZX proportional font\n"
+    },
+    {
+        "name": "printFzxChar",
+        "parameters": "char as ubyte",
+        "doc": "\nsub fastcall printFzxChar(char as ubyte)\n\nPrints a character using FZX proportional font\n"
+    }
+]

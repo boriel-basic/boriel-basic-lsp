@@ -1,0 +1,7 @@
+[
+    {
+        "name": "putTile",
+        "parameters": "x as uByte, y as uByte, graphicsAddr as uInteger",
+        "doc": "\nSUB putTile(x as uByte, y as uByte, graphicsAddr as uInteger)\n\nRoutine to place a 16 pixel by 16 pixel \"Tile\" onto the screen at character position x,y from address given.\nData must be in the format of 16 bit rows, followed by attribute data.\n\nParameters:\n  x - x coordinate (cell column)\n  y - y coordinate (cell row)\n  graphicsAddr - Memory address of the graphic\n"
+    }
+]

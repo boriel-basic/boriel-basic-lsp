@@ -1,0 +1,8 @@
+[
+    {
+        "name": "EvalBASIC",
+        "parameters": "ByVal basic as String",
+        "returnType": "Uinteger",
+        "doc": "\nFunction fastcall EvalBASIC(ByVal basic as String) as Uinteger\n\nEvaluates a BASIC string expression and returns the result\n"
+    }
+]

@@ -1,0 +1,7 @@
+[
+    {
+        "name": "clearBox",
+        "parameters": "x as uByte, y as uByte, width as uByte, height as uByte",
+        "doc": "\nSUB clearBox\n\nBlanks the pixels for a box, measured in Character Squares\nfrom print positions X,Y to X + Width, Y + height\n\nParameters:\n  x - x coordinate (cell column)\n  y - y coordinate (cell row)\n  width - width (number of columns)\n  height - height (number of rows)\n"
+    }
+]

@@ -1,0 +1,20 @@
+[
+    {
+        "name": "GetKey",
+        "parameters": "",
+        "returnType": "UByte",
+        "doc": "\nfunction GetKey()\n\nReturns:\n    Waits for a Key press and returns ASCII Code\n"
+    },
+    {
+        "name": "MultiKeys",
+        "parameters": "scancode as UInteger",
+        "returnType": "UByte",
+        "doc": "\nfunction FASTCALL MultiKeys(x as Ubyte)\n\nReturns:\n   Given the ScanCode, returns 0 if none of the given key(s) are\n   not pressed, not zero otherwise. Scancode is one of the UInteger\n   constants defined (KEYB, KEYSPACE, KEYCAPS, etc...)\n\n   It's possible to check for multiple keys at once using the bOR\n   operator.\n"
+    },
+    {
+        "name": "GetKeyScanCode",
+        "parameters": "",
+        "returnType": "UInteger",
+        "doc": "\nfunction FASTCALL GetKeyScanCode()\n\nReturns:\n   The pressed Key Scan Codes or 0 if none\n"
+    }
+]

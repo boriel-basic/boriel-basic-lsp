@@ -1,0 +1,8 @@
+[
+    {
+        "name": "hMirror",
+        "parameters": "number as uByte",
+        "returnType": "uByte",
+        "doc": "\nFunction fastcall hMirror(number as uByte) as uByte\n\nHorizontally mirrors the bits of a byte\n"
+    }
+]

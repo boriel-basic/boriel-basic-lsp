@@ -1,0 +1,8 @@
+[
+    {
+        "name": "Round",
+        "parameters": "n as Float, decimals as UByte = 0",
+        "returnType": "Float",
+        "doc": "\nFUNCTION Round(n as Float, decimals as UByte = 0) AS Float\n\nParameters:\n    n as Float: number to be rounded\n    decimals as Ubyte: number of decimals (default 0)\n\nReturns:\n   A float rounded towards +/- infinity with the numbers of decimals\n   requested.\n"
+    }
+]

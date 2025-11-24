@@ -1,0 +1,8 @@
+[
+    {
+        "name": "input42",
+        "parameters": "MaxLen AS UINTEGER",
+        "returnType": "STRING",
+        "doc": "\nFUNCTION input42(MaxLen AS UINTEGER) AS STRING\n\nSimple INPUT routine using PRINT42\nUsage: A$ = INPUT42(MaxChars)\n"
+    }
+]

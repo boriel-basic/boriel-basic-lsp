@@ -1,0 +1,12 @@
+[
+    {
+        "name": "dzx0Standard",
+        "parameters": "src as UINTEGER, dst as UINTEGER",
+        "doc": "\nsub FASTCALL dzx0Standard(src as UINTEGER, dst as UINTEGER)\n\nDecompress (from source to destination address) data that was previously\ncompressed using ZX0. This is the smallest version of the ZX0 decompressor.\n\nParameters:\n    src: source address (compressed data)\n    dst: destination address (decompressing)\n"
+    },
+    {
+        "name": "dzx0StandardBack",
+        "parameters": "src as UINTEGER, dst as UINTEGER",
+        "doc": "\nsub FASTCALL dzx0StandardBack(src as UINTEGER, dst as UINTEGER)\n\nDecompress (from source to destination address) data that was previously\ncompressed backwards using ZX0. This is the smallest version of the ZX0\ndecompressor.\n\nParameters:\n    src: last source address (compressed data)\n    dst: last destination address (decompressing)\n"
+    }
+]

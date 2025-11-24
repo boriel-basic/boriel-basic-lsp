@@ -1,0 +1,31 @@
+[
+    {
+        "name": "allocate",
+        "parameters": "byval n as uinteger",
+        "returnType": "uinteger",
+        "doc": "\nfunction FASTCALL allocate(byval n as uinteger) as uinteger\n\nAllocates the requested bytes in the heap (dynamic memory) and\nreturns the address (16 bit, unsigned) of the new bloc. If\nno memory, NULL (0) is returned.\n\nParameters:\n    n: number of bytes\n\nReturns:\n\t16 bits (pointer) unsigned integer. NULL is returned if not\n\tenough memory to allocate the block\n"
+    },
+    {
+        "name": "callocate",
+        "parameters": "byval n as uinteger",
+        "returnType": "uinteger",
+        "doc": "\nfunction FASTCALL callocate(byval n as uinteger) as uinteger\n\nAllocates the requested bytes in the heap (dynamic memory) and\nreturns the address (16 bit, unsigned) of the new bloc. If\nno memory, NULL (0) is returned.\nThe allocated block is cleared (filled with 0's) upon return.\n\nParameters:\n    n: number of bytes\n\nReturns:\n\t16 bits (pointer) unsigned integer. NULL is returned if not\n\tenough memory to allocate the block\n"
+    },
+    {
+        "name": "deallocate",
+        "parameters": "byval addr as integer",
+        "doc": "\nsub FASTCALL deallocate(byval addr as integer)\n\nFrees a block previously allocated with malloc, returning it\nto the heap.\n"
+    },
+    {
+        "name": "reallocate",
+        "parameters": "byval addr as uinteger, byval n as uinteger",
+        "returnType": "uinteger",
+        "doc": "\nfunction FASTCALL reallocate(byval addr as uinteger, byval n as uinteger) as uinteger\n\nReallocates the requested bytes in the heap (dynamic memory) and\nreturns the address (16 bit, unsigned) of the new bloc. If\nno memory, NULL (0) is returned.\n\nParameters:\n    addr: current pointer\n    n: number of bytes for the new size to reallocate\n\nReturns:\n\t16 bits (pointer) unsigned integer. NULL is returned if not\n\tenough memory to alloc the block\n"
+    },
+    {
+        "name": "memavail",
+        "parameters": "",
+        "returnType": "uInteger",
+        "doc": "\nfunction FASTCALL memavail as uInteger\n\nReturns the total amount of free memory in the heap\n"
+    }
+]

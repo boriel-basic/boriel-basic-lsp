@@ -1,0 +1,12 @@
+[
+    {
+        "name": "IM2Start",
+        "parameters": "callBack AS UInteger",
+        "doc": "\nsub IM2Start(callBack AS UInteger)\n\nIM2Start configures and initialises the interrupt service.\nAt each interruption the address \"callBack\" shall be called.\nWhen this service is activated, the FRAMES counter and the\nPAUSE and INKEY$ instructions no longer work correctly.\nNot working with \"INVES +\" models\n\nSample of use:\nIM2Start(@MyIM2Routine)   ' Use @<name>\nSUB MyIM2Routine()\n  ' Do something not too complicated\nEND SUB\n\nParameters:\n    callback (UInteger): Address to jump on every interrupt\n"
+    },
+    {
+        "name": "IM2Stop",
+        "parameters": "",
+        "doc": "\nsub IM2Stop()\n\nIM2Stop stops the interrupt service and restores ROM interrupts\n"
+    }
+]

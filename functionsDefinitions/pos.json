@@ -1,0 +1,8 @@
+[
+    {
+        "name": "pos",
+        "parameters": "",
+        "returnType": "ubyte",
+        "doc": "\nfunction FASTCALL pos as ubyte\n\nReturns:\n\tCurrent COLUMN print position\n"
+    }
+]

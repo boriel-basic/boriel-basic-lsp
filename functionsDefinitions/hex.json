@@ -1,0 +1,20 @@
+[
+    {
+        "name": "hex",
+        "parameters": "num as ULong",
+        "returnType": "String",
+        "doc": "\nfunction FASTCALL hex(num as ULong) as String\n\nParameters:\n    num : 32 bit unsigned integer number\n\nReturns:\n\t4 chars str containing the HEX string representation\n"
+    },
+    {
+        "name": "hex16",
+        "parameters": "n as UInteger",
+        "returnType": "String",
+        "doc": "\nfunction hex16(n as UInteger) as String\n\n16 bit version - Returns hex string representation\n"
+    },
+    {
+        "name": "hex8",
+        "parameters": "n as UByte",
+        "returnType": "String",
+        "doc": "\nFunction hex8 (n as UByte) as String\n\n8 bit version - Returns hex string representation\n"
+    }
+]

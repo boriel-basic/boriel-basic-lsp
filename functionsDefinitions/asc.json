@@ -1,0 +1,8 @@
+[
+    {
+        "name": "asc",
+        "parameters": "s AS STRING, x AS UINTEGER",
+        "returnType": "UBYTE",
+        "doc": "\nfunction asc(s AS STRING, x AS UINTEGER) AS UBYTE\n\nReturns the ASCII code of the character at position x in string s\n"
+    }
+]

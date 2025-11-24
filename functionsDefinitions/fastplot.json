@@ -1,0 +1,12 @@
+[
+    {
+        "name": "fastPlotXORAttr",
+        "parameters": "x AS UBYTE, y AS UBYTE, color AS UBYTE",
+        "doc": "\nSUB fastcall fastPlotXORAttr\n\nPlots a point at (x, y) in OVER 1 mode (XOR) with color as ATTR\nThis routine is slightly faster than PLOT XOR 1 with ATTRs\n"
+    },
+    {
+        "name": "fastPlotXOR",
+        "parameters": "x AS UBYTE, y AS UBYTE",
+        "doc": "\nSUB fastcall fastPlotXOR\n\nPlots a point at (x, y) in OVER 1 mode (XOR)\nThis routine is slightly faster than PLOT XOR 1\n"
+    }
+]

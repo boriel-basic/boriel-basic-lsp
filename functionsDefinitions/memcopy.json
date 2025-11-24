@@ -1,0 +1,17 @@
+[
+    {
+        "name": "MemMove",
+        "parameters": "source as uinteger, dest as uinteger, length as uinteger",
+        "doc": "\nsub fastcall MemMove(source, dest, length)\n\nParameters:\n    souceaddr: memory address of source block to copy\n    destaddr:  memory address of destiny block to copy\n    length:    number of bytes to copy\n\nCopies block of memory safely from source to dest.\nSource and destiny blocks may overlap\n"
+    },
+    {
+        "name": "MemCopy",
+        "parameters": "source as uinteger, dest as uinteger, length as uinteger",
+        "doc": "\nsub fastcall MemCopy(source, dest, length)\n\nParameters:\n    souceaddr: memory address of source block to copy\n    destaddr:  memory address of destiny block to copy\n    length:    number of bytes to copy\n\nCopies block of memory from source to dest.\nSource and destiny blocks should not overlap.\nThis sub is slightly faster than memmove\n"
+    },
+    {
+        "name": "MemSet",
+        "parameters": "dest as uinteger, value as ubyte, length as uinteger",
+        "doc": "\nsub fastcall MemSet(dest, value, length)\n\nParameters:\n    destaddr:  memory address of destiny block to fill\n    value:     value to fill with\n    length:    number of bytes to fill\n"
+    }
+]

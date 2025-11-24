@@ -1,0 +1,26 @@
+[
+    {
+        "name": "GetScreenBufferAddr",
+        "parameters": "",
+        "returnType": "UInteger",
+        "doc": "\nFunction Fastcall GetScreenBufferAddr As UInteger\n\nReturns:\n    The address of the Screen Buffer\n"
+    },
+    {
+        "name": "SetScreenBufferAddr",
+        "parameters": "addr As UInteger",
+        "returnType": "UInteger",
+        "doc": "\nFunction Fastcall SetScreenBufferAddr(addr As UInteger) As UInteger\n\nSets the address of the screen buffer and returns it\n\nParameters:\n - Address: Uinteger value with the new address\n\nReturns:\n    The address of the screen buffer\n"
+    },
+    {
+        "name": "GetAttrBufferAddr",
+        "parameters": "",
+        "returnType": "UInteger",
+        "doc": "\nFunction Fastcall GetAttrBufferAddr As UInteger\n\nReturns:\n    The address of the attribute buffer\n"
+    },
+    {
+        "name": "SetAttrBufferAddr",
+        "parameters": "addr As UInteger",
+        "returnType": "UInteger",
+        "doc": "\nFunction Fastcall SetAttrBufferAddr(addr As UInteger) As UInteger\n\nSets the address of the attribute buffer and returns it\n\nParameters:\n - Address: UInteger value with the new address\n\nReturns:\n    The address of the attribute buffer\n"
+    }
+]

@@ -1,0 +1,26 @@
+[
+    {
+        "name": "fSin",
+        "parameters": "num as FIXED",
+        "returnType": "FIXED",
+        "doc": "\nFUNCTION fSin(num as FIXED) as FIXED\n\nFast fixed-point sine function\n"
+    },
+    {
+        "name": "fCos",
+        "parameters": "num as FIXED",
+        "returnType": "FIXED",
+        "doc": "\nFUNCTION fCos(num as FIXED) as FIXED\n\nFast fixed-point cosine function\n"
+    },
+    {
+        "name": "fTan",
+        "parameters": "num as FIXED",
+        "returnType": "FIXED",
+        "doc": "\nFUNCTION fTan(num as FIXED) as FIXED\n\nFast fixed-point tangent function\n"
+    },
+    {
+        "name": "fSqrt",
+        "parameters": "radicand as FLOAT",
+        "returnType": "FLOAT",
+        "doc": "\nFUNCTION FASTCALL fSqrt (radicand as FLOAT) as FLOAT\n\nFast floating Point Square Root Function\n"
+    }
+]

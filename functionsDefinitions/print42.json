@@ -1,0 +1,12 @@
+[
+    {
+        "name": "printat42",
+        "parameters": "y as uByte, x as uByte",
+        "doc": "\nSUB printat42 (y as uByte, x as uByte)\n\nChanges print coordinates for 42-column mode\n"
+    },
+    {
+        "name": "print42",
+        "parameters": "characters$ as string",
+        "doc": "\nSUB print42(characters$ as string)\n\nPrints string in 42-column mode\n"
+    }
+]

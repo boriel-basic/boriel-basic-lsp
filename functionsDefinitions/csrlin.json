@@ -1,0 +1,8 @@
+[
+    {
+        "name": "csrlin",
+        "parameters": "",
+        "returnType": "ubyte",
+        "doc": "\nfunction FASTCALL csrlin as ubyte\n\nReturns:\n\tA byte containing the current ROW printing position\n"
+    }
+]

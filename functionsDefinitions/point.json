@@ -1,0 +1,8 @@
+[
+    {
+        "name": "point",
+        "parameters": "x as ubyte, y as ubyte",
+        "returnType": "byte",
+        "doc": "\nfunction fastcall point(x, y)\n\nParameters:\n    x: X coord (0 to 255)\n    y: Y coord (0 to 191)\n\nReturns:\n    1 if point is plot 0 otherwise (byte)\n"
+    }
+]
