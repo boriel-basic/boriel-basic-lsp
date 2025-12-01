@@ -36,20 +36,20 @@ builtinDefinitions.forEach(def => {
 // Obtener la ruta del proyecto desde los argumentos
 const projectPath = process.argv[2]; // La ruta del proyecto se pasa como argumento al servidor
 
-if (!projectPath) {
+if (!projectPath && require.main === module) {
     console.error('No se proporcionó la ruta del proyecto.');
     process.exit(1);
 }
 
 // Cargar y procesar el archivo .gitignore
-const gitignorePath = path.join(projectPath, '.gitignore');
+const gitignorePath = projectPath ? path.join(projectPath, '.gitignore') : null;
 const ig = ignore();
 
-if (fs.existsSync(gitignorePath)) {
+if (gitignorePath && fs.existsSync(gitignorePath)) {
     const gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
     ig.add(gitignoreContent);
     console.log('Reglas de .gitignore cargadas:', gitignoreContent.split('\n').filter(Boolean));
-} else {
+} else if (projectPath) {
     console.warn('No se encontró un archivo .gitignore en el proyecto.');
 }
 

@@ -4,6 +4,7 @@ const {
 } = require('vscode-languageserver/node');
 
 const { borielBasicKeywords } = require('./const');
+const { stripComments } = require('./analyzer');
 
 function formatBorielBasicCode(document, options = { formatKeywords: false }) {
     const text = document.getText();
@@ -18,12 +19,12 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
             keyword.label.replace(/\\\$/g, '$').toUpperCase()
         )
     );
-        // Crear un conjunto de funciones builtin (type: 'function') para camelCase
-        const builtinFunctionsSet = new Set(
-            borielBasicKeywords
-                .filter(keyword => keyword.type === 'function')
-                .map(keyword => keyword.label.toUpperCase())
-        );
+    // Crear un conjunto de funciones builtin (type: 'function') para camelCase
+    const builtinFunctionsSet = new Set(
+        borielBasicKeywords
+            .filter(keyword => keyword.type === 'function')
+            .map(keyword => keyword.label.toUpperCase())
+    );
 
     lines.forEach((line, i) => {
         const trimmedLine = line.trim();
@@ -102,19 +103,19 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
             }
 
             codePart = codePart.replace(/[\w\$]+/g, (word) => {
-                    const upperWord = word.toUpperCase();
-                    if (builtinFunctionsSet.has(upperWord)) {
-                        // camelCase para funciones builtin
-                        const camel = word.charAt(0).toLowerCase() + word.slice(1);
-                        console.log(`Función builtin formateada: "${word}" -> "${camel}"`);
-                        return camel;
-                    }
-                    if (keywordsSet.has(upperWord)) {
-                        const pascalWord = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-                        console.log(`Palabra clave formateada: "${word}" -> "${pascalWord}"`);
-                        return pascalWord;
-                    }
-                    return word;
+                const upperWord = word.toUpperCase();
+                if (builtinFunctionsSet.has(upperWord)) {
+                    // camelCase para funciones builtin
+                    const camel = word.charAt(0).toLowerCase() + word.slice(1);
+                    console.log(`Función builtin formateada: "${word}" -> "${camel}"`);
+                    return camel;
+                }
+                if (keywordsSet.has(upperWord)) {
+                    const pascalWord = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                    console.log(`Palabra clave formateada: "${word}" -> "${pascalWord}"`);
+                    return pascalWord;
+                }
+                return word;
             });
 
             formattedLine = codePart + commentPart;
@@ -146,7 +147,9 @@ function formatBorielBasicCode(document, options = { formatKeywords: false }) {
             }
 
             // Si es un "IF ... THEN" con más contenido en la misma línea, no incrementar
-            if (/^\s*(?!#IFDEF|#IFNDEF)\bIF\b.+\bTHEN\b.+$/i.test(trimmedLine)) {
+            // Primero, eliminar comentarios para verificar si hay código real después de THEN
+            const lineWithoutComments = stripComments(trimmedLine).trim();
+            if (/^\s*(?!#IFDEF|#IFNDEF)\bIF\b.+\bTHEN\b.+$/i.test(lineWithoutComments)) {
                 console.log(`No se incrementa la indentación para la línea: "${trimmedLine}"`);
                 return;
             }

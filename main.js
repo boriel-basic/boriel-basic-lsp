@@ -10,12 +10,14 @@ const {
 const { TextDocument } = require('vscode-languageserver-textdocument');
 const { URI } = require('vscode-uri');
 const path = require('path');
+const packageJson = require('./package.json');
 
 const projectPath = process.argv[2];
 
 // Crear conexión con el cliente
 const connection = createConnection();
-connection.console.info('Boriel Basic LSP server is running');
+connection.console.info(`Boriel Basic LSP server is running - Version ${packageJson.version}`);
+console.log(`[LSP] Boriel Basic LSP server started - Version ${packageJson.version}`);
 
 // Manejo de documentos abiertos
 const documents = new TextDocuments(TextDocument);
