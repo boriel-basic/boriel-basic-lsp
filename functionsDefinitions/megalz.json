@@ -1,0 +1,7 @@
+[
+    {
+        "name": "megaLZDepack",
+        "parameters": "source as UInteger, dest as UInteger",
+        "doc": "SUB FastCall megaLZDepack(source as UInteger, dest as UInteger)\n\nDepack data compressed with MegaLZ. Provide source and destination addresses."
+    }
+]

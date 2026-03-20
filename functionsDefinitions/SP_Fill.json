@@ -1,0 +1,7 @@
+[
+    {
+        "name": "SP_Fill",
+        "parameters": "",
+        "doc": "Placeholder for functions in SP/Fill.bas. See https://raw.githubusercontent.com/boriel-basic/zxbasic/main/src/lib/arch/zx48k/stdlib/SP/Fill.bas for details."
+    }
+]

@@ -1,0 +1,7 @@
+[
+    {
+        "name": "waitretrace",
+        "parameters": "",
+        "doc": "Macro waitretrace\n\nSimple retrace/wait macro using HALT instruction. Use as a short pause until screen retrace."
+    }
+]

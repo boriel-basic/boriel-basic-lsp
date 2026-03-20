@@ -1,0 +1,7 @@
+[
+    {
+        "name": "fzx_font_file",
+        "parameters": "filename$",
+        "doc": "Placeholder index for files in fzx_fonts/ — these are font binary/text files (.fzx). Copy functions or loaders as needed from the raw files listed in the repo."
+    }
+]

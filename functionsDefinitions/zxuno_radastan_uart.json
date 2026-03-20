@@ -1,0 +1,12 @@
+[
+    {
+        "name": "radastan",
+        "parameters": "",
+        "doc": "Placeholder for functions in zxuno/radastan.bas. See raw file for actual functions."
+    },
+    {
+        "name": "uart",
+        "parameters": "",
+        "doc": "Placeholder for functions in zxuno/uart.bas — UART helpers for ZX Uno hardware."
+    }
+]

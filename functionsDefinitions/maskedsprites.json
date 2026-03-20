@@ -1,0 +1,60 @@
+[
+    {
+        "name": "SetVisibleScreen",
+        "parameters": "bankNumber AS UByte",
+        "doc": "SUB FASTCALL SetVisibleScreen(bankNumber AS UByte)\n\nSet visible screen to bank 5 or 7 and update BANKM system variable (128K+)."
+    },
+    {
+        "name": "GetVisibleScreen",
+        "parameters": "",
+        "returnType": "UByte",
+        "doc": "FUNCTION FASTCALL GetVisibleScreen() AS UByte\n\nReturn visible screen bank (5 or 7)."
+    },
+    {
+        "name": "ToggleVisibleScreen",
+        "parameters": "",
+        "doc": "SUB FASTCALL ToggleVisibleScreen()\n\nToggle visible screen between bank 5 and 7."
+    },
+    {
+        "name": "CopyScreen5ToScreen7",
+        "parameters": "",
+        "doc": "SUB CopyScreen5ToScreen7()\n\nCopy contents of screen5 to screen7 (display file + attributes)."
+    },
+    {
+        "name": "CopyScreen7ToScreen5",
+        "parameters": "",
+        "doc": "SUB CopyScreen7ToScreen5()\n\nCopy contents of screen7 to screen5 (display file + attributes)."
+    },
+    {
+        "name": "SetDrawingScreen5",
+        "parameters": "",
+        "doc": "SUB FASTCALL SetDrawingScreen5()\n\nSet drawing buffers to screen5 addresses."
+    },
+    {
+        "name": "SetDrawingScreen7",
+        "parameters": "",
+        "returnType": "UByte",
+        "doc": "FUNCTION FASTCALL SetDrawingScreen7() AS UByte\n\nSet drawing buffers to screen7 and return previous bank at $c000."
+    },
+    {
+        "name": "ToggleDrawingScreen",
+        "parameters": "",
+        "doc": "SUB FASTCALL ToggleDrawingScreen()\n\nToggle drawing buffers between screen5 and screen7."
+    },
+    {
+        "name": "ChangeMaskedSpritesBackgroundSet",
+        "parameters": "",
+        "returnType": "Byte",
+        "doc": "FUNCTION FASTCALL ChangeMaskedSpritesBackgroundSet() AS Byte\n\nToggle background set and return new set index."
+    },
+    {
+        "name": "SaveBackgroundAndDrawSprite",
+        "parameters": "X as UByte, Y as UByte, backgroundDir as UInteger, spriteImageDir as UInteger",
+        "doc": "SUB FASTCALL SaveBackgroundAndDrawSprite(X, Y, backgroundDir, spriteImageDir)\n\nSave background at given Dir and draw masked sprite at (X,Y) using provided sprite image directory."
+    },
+    {
+        "name": "RestoreBackground",
+        "parameters": "X as UByte, Y as UByte, backgroundDir as UInteger",
+        "doc": "SUB FASTCALL RestoreBackground(X, Y, backgroundDir)\n\nRestore previously saved background at (X,Y) from given directory."
+    }
+]
