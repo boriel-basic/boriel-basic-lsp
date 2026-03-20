@@ -2,17 +2,17 @@
     {
         "name": "SetBank",
         "parameters": "bankNumber AS UByte",
-        "doc": "SUB FASTCALL SetBank(bankNumber AS UByte)\n\nPlace the specified bank at $c000 and update system variable BANKM. Only for 128K+ models."
+        "doc": "SUB FASTCALL SetBank(bankNumber AS UByte)\n\nPlace the bank indicated by bankNumber in the memory slot between $C000 and $FFFF and update the system variable BANKM.\nOnly works on 128K and compatible models.\n\nParameters:\n    bankNumber: bank number to place at $C000\n\nDanger: If your program exceeds address $C000 this may cause problems. Use at your own risk."
     },
     {
         "name": "GetBank",
         "parameters": "",
         "returnType": "UByte",
-        "doc": "FUNCTION FASTCALL GetBank() AS UByte\n\nReturn the bank number currently placed at $c000."
+        "doc": "FUNCTION FASTCALL GetBank() AS UByte\n\nReturn the memory bank currently placed at $C000, based on the system variable BANKM.\nOnly works on 128K and compatible models.\n\nReturns:\n    Bank number (UByte) placed at $C000."
     },
     {
         "name": "SetCodeBank",
         "parameters": "bankNumber AS UByte",
-        "doc": "SUB SetCodeBank(bankNumber AS UByte)\n\nPlace a bank at $8000-$bfff copying code/data as needed and restore previous bank."
+        "doc": "SUB SetCodeBank(bankNumber AS UByte)\n\nPlace the bank indicated by bankNumber in the slot between $C000 and $FFFF, copy its contents to $8000–$BFFF, then restore the bank that was at $C000 before.\nOnly works on 128K and compatible models.\n\nParameters:\n    bankNumber: bank number to copy to $8000–$BFFF\n\nDanger: The contents of memory between $8000 and $BFFF are lost. If your program exceeds $8000 this may cause problems. Use at your own risk."
     }
 ]

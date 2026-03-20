@@ -1,22 +1,42 @@
 [
     {
         "name": "ScrollRight",
-        "parameters": "x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte",
-        "doc": "\nsub fastcall ScrollRight\n\npixel by pixel right scroll\nscrolls 1 pixel right the window defined by (x1, y1, x2, y2)\n"
+        "parameters": "x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte",
+        "doc": "Sub FASTCALL ScrollRight(x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte)\n\nScroll the pixel window 1 pixel to the right.\n\nParameters:\n    x1, y1: top-left pixel of the window\n    x2, y2: bottom-right pixel of the window"
     },
     {
         "name": "ScrollLeft",
-        "parameters": "x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte",
-        "doc": "\nsub fastcall ScrolLeft\n\npixel by pixel left scroll\nscrolls 1 pixel left the window defined by (x1, y1, x2, y2)\n"
+        "parameters": "x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte",
+        "doc": "Sub FASTCALL ScrollLeft(x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte)\n\nScroll the pixel window 1 pixel to the left.\n\nParameters:\n    x1, y1: top-left pixel of the window\n    x2, y2: bottom-right pixel of the window"
     },
     {
         "name": "ScrollUp",
-        "parameters": "x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte",
-        "doc": "\nsub fastcall ScrolUp\n\npixel by pixel up scroll\nscrolls 1 pixel up the window defined by (x1, y1, x2, y2)\n"
+        "parameters": "x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte",
+        "doc": "Sub FASTCALL ScrollUp(x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte)\n\nScroll the pixel window 1 pixel up.\n\nParameters:\n    x1, y1: top-left pixel of the window\n    x2, y2: bottom-right pixel of the window"
     },
     {
         "name": "ScrollDown",
-        "parameters": "x1 as uByte, y1 as uByte, x2 as Ubyte, y2 as Ubyte",
-        "doc": "\nsub fastcall ScrolDown\n\npixel by pixel down scroll\nscrolls 1 pixel down the window defined by (x1, y1, x2, y2)\n"
+        "parameters": "x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte",
+        "doc": "Sub FASTCALL ScrollDown(x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte)\n\nScroll the pixel window 1 pixel down.\n\nParameters:\n    x1, y1: top-left pixel of the window\n    x2, y2: bottom-right pixel of the window"
+    },
+    {
+        "name": "ScrollRightAligned",
+        "parameters": "x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte",
+        "doc": "Sub FASTCALL ScrollRightAligned(x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte)\n\nScroll the pixel window 1 pixel to the right, aligned to character columns.\nx1 and x2 are divided by 8 (floor) to get the column number (0..31).\n\nParameters:\n    x1, y1: top-left pixel of the window\n    x2, y2: bottom-right pixel of the window"
+    },
+    {
+        "name": "ScrollLeftAligned",
+        "parameters": "x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte",
+        "doc": "Sub FASTCALL ScrollLeftAligned(x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte)\n\nScroll the pixel window 1 pixel to the left, aligned to character columns.\nx1 and x2 are divided by 8 (floor) to get the column number (0..31).\n\nParameters:\n    x1, y1: top-left pixel of the window\n    x2, y2: bottom-right pixel of the window"
+    },
+    {
+        "name": "ScrollUpAligned",
+        "parameters": "x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte",
+        "doc": "Sub FASTCALL ScrollUpAligned(x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte)\n\nScroll the pixel window 1 pixel up, aligned to character columns.\nx1 and x2 are divided by 8 (floor) to get the column number (0..31).\n\nParameters:\n    x1, y1: top-left pixel of the window\n    x2, y2: bottom-right pixel of the window"
+    },
+    {
+        "name": "ScrollDownAligned",
+        "parameters": "x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte",
+        "doc": "Sub FASTCALL ScrollDownAligned(x1 As UByte, y1 As UByte, x2 As UByte, y2 As UByte)\n\nScroll the pixel window 1 pixel down, aligned to character columns.\nx1 and x2 are divided by 8 (floor) to get the column number (0..31).\n\nParameters:\n    x1, y1: top-left pixel of the window\n    x2, y2: bottom-right pixel of the window"
     }
 ]

@@ -1,7 +1,1 @@
-[
-    {
-        "name": "sinclair_init",
-        "parameters": "",
-        "doc": "Library sinclair.bas: includes classic Sinclair helpers and performs UDG and SCREEN offset initialization when used. This file mainly includes other modules (attr, point, screen, input, alloc)."
-    }
-]
+[]

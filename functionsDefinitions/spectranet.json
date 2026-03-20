@@ -3,125 +3,125 @@
         "name": "SNETsocket",
         "parameters": "stype As UByte",
         "returnType": "Byte",
-        "doc": "Function FASTCALL SNETsocket(stype As UByte) As Byte\n\nCreate a Spectranet socket and return its id (byte)."
+        "doc": "Function FASTCALL SNETsocket(stype As UByte) As Byte\n\nCreate a Spectranet socket.\n\nParameters:\n    stype: socket type (1=STREAM, 2=DATAGRAM, 3=RAW)\n\nReturns:\n    Socket ID (Byte), or negative on error."
     },
     {
         "name": "SNETbind",
         "parameters": "socket As UByte, port As UInteger",
         "returnType": "Byte",
-        "doc": "Function FASTCALL SNETbind(socket, port) As Byte\n\nBind socket to port."
+        "doc": "Function FASTCALL SNETbind(socket As UByte, port As UInteger) As Byte\n\nBind a socket to a local port.\n\nParameters:\n    socket: socket ID returned by SNETsocket\n    port: local port number"
     },
     {
         "name": "SNETlisten",
         "parameters": "socket As UByte",
         "returnType": "Byte",
-        "doc": "Function FASTCALL SNETlisten(socket) As Byte\n\nListen for incoming connections."
+        "doc": "Function FASTCALL SNETlisten(socket As UByte) As Byte\n\nPut a socket into listening state for incoming connections.\n\nParameters:\n    socket: socket ID returned by SNETsocket"
     },
     {
         "name": "SNETaccept",
         "parameters": "socket As UByte",
         "returnType": "Byte",
-        "doc": "Function FASTCALL SNETaccept(socket) As Byte\n\nAccept incoming connection on listening socket."
+        "doc": "Function FASTCALL SNETaccept(socket As UByte) As Byte\n\nAccept a pending incoming connection on a listening socket.\n\nParameters:\n    socket: listening socket ID\n\nReturns:\n    New socket ID for the accepted connection."
     },
     {
         "name": "SNETconnect",
         "parameters": "socket As UByte, ip$, port As UInteger",
         "returnType": "Byte",
-        "doc": "Function SNETconnect(socket, ip$, port) As Byte\n\nConnect socket to remote ip and port."
+        "doc": "Function FASTCALL SNETconnect(socket As UByte, ip$, port As UInteger) As Byte\n\nConnect a socket to a remote host.\n\nParameters:\n    socket: socket ID returned by SNETsocket\n    ip$: IP address as a binary string, e.g. CHR$(10,0,0,1) for 10.0.0.1\n    port: remote port number"
     },
     {
         "name": "SNETclose",
         "parameters": "socket As UByte",
         "returnType": "Byte",
-        "doc": "Function FASTCALL SNETclose(socket) As Byte\n\nClose a socket."
+        "doc": "Function FASTCALL SNETclose(socket As UByte) As Byte\n\nClose a socket and release its resources.\n\nParameters:\n    socket: socket ID to close"
     },
     {
         "name": "SNETrecv",
         "parameters": "socket As UByte, addr As UInteger, length As UInteger",
         "returnType": "Byte",
-        "doc": "Function FASTCALL SNETrecv(socket, addr, length) As Byte\n\nReceive data into memory address. Returns status/bytes."
+        "doc": "Function FASTCALL SNETrecv(socket As UByte, addr As UInteger, length As UInteger) As Byte\n\nReceive data from a socket into a memory buffer.\n\nParameters:\n    socket: socket ID\n    addr: destination memory address\n    length: maximum bytes to receive"
     },
     {
         "name": "SNETsend",
         "parameters": "socket As UByte, addr As UInteger, length As UInteger",
         "returnType": "Byte",
-        "doc": "Function FASTCALL SNETsend(socket, addr, length) As Byte\n\nSend data from memory address."
+        "doc": "Function FASTCALL SNETsend(socket As UByte, addr As UInteger, length As UInteger) As Byte\n\nSend data from a memory buffer through a socket.\n\nParameters:\n    socket: socket ID\n    addr: source memory address\n    length: number of bytes to send"
     },
     {
         "name": "SNETpollfd",
         "parameters": "socket As UByte",
         "returnType": "UByte",
-        "doc": "Function FASTCALL SNETpollfd(socket) As UByte\n\nPoll socket file descriptor."
+        "doc": "Function FASTCALL SNETpollfd(socket As UByte) As UByte\n\nPoll a socket to check if data is available for reading.\n\nParameters:\n    socket: socket ID\n\nReturns:\n    Non-zero if data is available, 0 otherwise."
     },
     {
         "name": "SNETpeekUinteger",
         "parameters": "addr as UInteger",
         "returnType": "UInteger",
-        "doc": "Function FASTCALL SNETpeekUinteger(addr as UInteger) As UInteger\n\nRead a 16-bit value from paged memory safely."
+        "doc": "Function FASTCALL SNETpeekUinteger(addr As UInteger) As UInteger\n\nRead a 16-bit (UInteger) value from Spectranet paged memory.\n\nParameters:\n    addr: memory address to read from (in Spectranet paged space)"
     },
     {
         "name": "SNETmount",
         "parameters": "mpoint as UByte, proto$, host$, source$, userid$, passwd$",
         "returnType": "Integer",
-        "doc": "Function SNETmount(mpoint, proto$, host$, source$, userid$, passwd$) As Integer\n\nMount a remote filesystem; returns session number."
+        "doc": "Function SNETmount(mpoint As UByte, proto$, host$, source$, userid$, passwd$) As Integer\n\nMount a remote filesystem on a mount point.\n\nParameters:\n    mpoint: mount point number\n    proto$: protocol name, e.g. \"tnfs\"\n    host$: remote host name or IP\n    source$: source path on the remote host\n    userid$: user ID (empty string if none)\n    passwd$: password (empty string if none)\n\nReturns:\n    Session number (Integer).\n\nExample:\n    SNETmount(0, \"tnfs\", \"vexed4.alioth.net\", \"\", \"\", \"\")"
     },
     {
         "name": "SNETcurrMPoint",
         "parameters": "",
         "returnType": "Byte",
-        "doc": "Function SNETcurrMPoint() As Byte\n\nReturn current mount point."
+        "doc": "Function SNETcurrMPoint() As Byte\n\nReturn the current active mount point number."
     },
     {
         "name": "SNETsetmountpt",
         "parameters": "mpoint",
-        "doc": "Sub FASTCALL SNETsetmountpt(mpoint)\n\nChange current mount point."
+        "doc": "Sub FASTCALL SNETsetmountpt(mpoint)\n\nSet the active mount point.\n\nParameters:\n    mpoint: mount point number to make active"
     },
     {
         "name": "SNETumount",
         "parameters": "mpoint as UByte",
         "returnType": "UInteger",
-        "doc": "Function FASTCALL SNETumount(mpoint) As UInteger\n\nUnmount a previously mounted filesystem."
+        "doc": "Function FASTCALL SNETumount(mpoint As UByte) As UInteger\n\nUnmount a previously mounted filesystem.\n\nParameters:\n    mpoint: mount point number to unmount\n\nExample:\n    SNETumount(0)"
     },
     {
         "name": "SNETopen",
         "parameters": "mpoint as UByte, fname$, flags as UInteger, chmod as UInteger",
         "returnType": "Byte",
-        "doc": "Function SNETopen(mpoint, fname$, flags, chmod) As Byte\n\nOpen a remote file; returns handle or -1 on error."
+        "doc": "Function SNETopen(mpoint As UByte, fname$, flags As UInteger, chmod As UInteger) As Byte\n\nOpen a file on the remote filesystem.\n\nParameters:\n    mpoint: mount point number\n    fname$: filename\n    flags: open flags (O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_TRUNC, O_APPEND, O_EXCL)\n    chmod: file permission mode (e.g. 0666o)\n\nReturns:\n    File handle (Byte), or -1 on error.\n\nExample:\n    fhandle = SNETopen(0, \"myfile.bin\", O_RDONLY, 0)"
     },
     {
         "name": "SNETfread",
         "parameters": "fhandle as UByte, addr as UInteger, size as UInteger",
         "returnType": "UInteger",
-        "doc": "Function FASTCALL SNETfread(fhandle, addr, size) As UInteger\n\nRead file content into memory; returns bytes read."
+        "doc": "Function FASTCALL SNETfread(fhandle As UByte, addr As UInteger, size As UInteger) As UInteger\n\nRead content from an open file into a memory address.\n\nParameters:\n    fhandle: file handle returned by SNETopen or SNETfopen\n    addr: destination memory address\n    size: number of bytes to read\n\nReturns:\n    Number of bytes effectively read.\n\nExample:\n    SNETfread(f, 16384, 6912)  ' load a screen"
     },
     {
         "name": "SNETfwrite",
         "parameters": "fhandle as UByte, addr as UInteger, size as UInteger",
         "returnType": "UInteger",
-        "doc": "Function FASTCALL SNETfwrite(fhandle, addr, size) As UInteger\n\nWrite memory content to file; returns bytes written."
+        "doc": "Function FASTCALL SNETfwrite(fhandle As UByte, addr As UInteger, size As UInteger) As UInteger\n\nWrite content from a memory address into an open file.\n\nParameters:\n    fhandle: file handle returned by SNETopen or SNETfopen\n    addr: source memory address\n    size: number of bytes to write\n\nReturns:\n    Number of bytes effectively written.\n\nExample:\n    SNETfwrite(f, 16384, 6912)  ' save a screen"
     },
     {
         "name": "SNETfopen",
         "parameters": "mpoint as UByte, fname$, mode$",
         "returnType": "Byte",
-        "doc": "Function SNETfopen(mpoint, fname$, mode$) As Byte\n\nConvenience fopen-like wrapper returning file handle."
+        "doc": "Function SNETfopen(mpoint As UByte, fname$, mode$) As Byte\n\nOpen a file using C-style mode string. Wraps SNETopen.\n\nParameters:\n    mpoint: mount point number\n    fname$: filename\n    mode$: mode string — \"r\" read, \"w\" write/create/truncate, \"a\" append, \"+\" read+write\n\nReturns:\n    File handle (Byte), or -1 on error."
     },
     {
         "name": "SNETfclose",
         "parameters": "fhandle as UByte",
         "returnType": "Byte",
-        "doc": "Function FASTCALL SNETfclose(fhandle) As Byte\n\nClose remote file; returns 0 on success."
+        "doc": "Function FASTCALL SNETfclose(fhandle As UByte) As Byte\n\nClose an open file handle.\n\nParameters:\n    fhandle: file handle returned by SNETopen or SNETfopen\n\nReturns:\n    0 on success.\n\nExample:\n    SNETfclose(f)"
     },
     {
         "name": "SNETfseek",
         "parameters": "fhandle as UByte, op as UByte, pos as ULong",
         "returnType": "Byte",
-        "doc": "Function FASTCALL SNETfseek(fhandle, op, pos) As Byte\n\nChange file read/write position."
+        "doc": "Function FASTCALL SNETfseek(fhandle As UByte, op As UByte, pos As ULong) As Byte\n\nChange the current file read/write position.\n\nParameters:\n    fhandle: file handle\n    op: seek origin — SEEK_SET (0), SEEK_CUR (1), SEEK_END (2)\n    pos: byte offset from the origin\n\nReturns:\n    0 on success.\n\nExample:\n    SNETfseek(f, SEEK_END, 0)  ' jump to end of file"
     },
     {
         "name": "SNETunlink",
         "parameters": "fname$",
         "returnType": "Byte",
-        "doc": "Function SNETunlink(fname$) As Byte\n\nDelete a remote file; returns 0 on success."
+        "doc": "Function SNETunlink(fname$) As Byte\n\nDelete a file from the remote filesystem.\n\nParameters:\n    fname$: filename to delete\n\nReturns:\n    0 on success.\n\nExample:\n    SNETunlink(\"myfile.dat\")"
     }
 ]

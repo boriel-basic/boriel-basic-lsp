@@ -174,35 +174,40 @@ connection.onHover((params) => {
     // Priorizar definiciones globales (incluye builtins)
     if (globalDefinitions.has(wordAtPosition)) {
         const def = globalDefinitions.get(wordAtPosition);
-        const headerText = def.header || wordAtPosition;
         const docText = def.doc || '';
 
-        const contents = {
-            kind: 'markdown',
-            // Mostrar la cabecera como bloque de código freebasic para que el cliente
-            // aplique resaltado de sintaxis (FreeBasic es el más similar a Boriel Basic)
-            value: '\n\n```freebasic\n' + headerText + '\n```\n\n' + docText
-        };
+        let codeSignature = '';
+        let description = '';
 
-        return { contents };
+        if (docText) {
+            // El doc tiene la firma completa en el primer párrafo y la descripción a continuación
+            const parts = docText.split('\n\n');
+            codeSignature = parts[0].trim();
+            // Preservar saltos de línea simples convirtiéndolos a markdown (dos espacios + \n)
+            description = parts.slice(1).join('\n\n').trim().replace(/\n/g, '  \n');
+        } else {
+            codeSignature = def.header || `${def.type} ${def.name}(${def.parameters || ''})`;
+        }
+
+        const mdValue = '```borielbasic\n' + codeSignature + '\n```' +
+            (description ? '\n\n' + description : '') +
+            `\n\n---\n*boriel-basic-lsp v${packageJson.version}*`;
+
+        return { contents: { kind: 'markdown', value: mdValue } };
     }
 
     // Si no es una definición global, buscar en las palabras clave de Boriel Basic
     const keyword = borielBasicKeywords.find(k => k.label.toUpperCase() === wordAtPosition.toUpperCase());
 
     if (keyword) {
-        let signature = '';
-        if (keyword.type === 'function' && keyword.parameters) {
-            signature = `\`${keyword.label}(${keyword.parameters}) -> ${keyword.returnType || 'void'}\`\n\n`;
-        } else if (keyword.type === 'function') {
-            signature = `\`${keyword.label}() -> ${keyword.returnType || 'void'}\`\n\n`;
+        let codeSignature = keyword.label;
+        if (keyword.parameters !== undefined && keyword.type === 'function') {
+            codeSignature = `${keyword.label}(${keyword.parameters}) As ${keyword.returnType || 'Void'}`;
         }
 
-        const contents = {
-            kind: 'markdown',
-            value: `**${keyword.label}**\n\n${signature}${keyword.detail}`
-        };
-        return { contents };
+        const mdValue = '```borielbasic\n' + codeSignature + '\n```\n\n' + keyword.detail +
+            `\n\n---\n*boriel-basic-lsp v${packageJson.version}*`;
+        return { contents: { kind: 'markdown', value: mdValue } };
     }
 
     return null;

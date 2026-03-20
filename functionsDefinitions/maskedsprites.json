@@ -2,59 +2,60 @@
     {
         "name": "SetVisibleScreen",
         "parameters": "bankNumber AS UByte",
-        "doc": "SUB FASTCALL SetVisibleScreen(bankNumber AS UByte)\n\nSet visible screen to bank 5 or 7 and update BANKM system variable (128K+)."
+        "doc": "SUB FASTCALL SetVisibleScreen(bankNumber AS UByte)\n\nSet the visible screen (either bank5 or bank7) and update system variable BANKM.\nOnly works on 128K and compatible models.\n\nParameters:\n    bankNumber (UByte): bank number 5 or 7"
     },
     {
         "name": "GetVisibleScreen",
         "parameters": "",
         "returnType": "UByte",
-        "doc": "FUNCTION FASTCALL GetVisibleScreen() AS UByte\n\nReturn visible screen bank (5 or 7)."
+        "doc": "FUNCTION FASTCALL GetVisibleScreen() AS UByte\n\nReturn the visible screen bank (5 or 7) according to system variable BANKM.\nOnly works on 128K and compatible models."
     },
     {
         "name": "ToggleVisibleScreen",
         "parameters": "",
-        "doc": "SUB FASTCALL ToggleVisibleScreen()\n\nToggle visible screen between bank 5 and 7."
+        "doc": "SUB FASTCALL ToggleVisibleScreen()\n\nToggle the visible screen from bank5 to bank7 or from bank7 to bank5.\nOnly works on 128K and compatible models."
     },
     {
         "name": "CopyScreen5ToScreen7",
         "parameters": "",
-        "doc": "SUB CopyScreen5ToScreen7()\n\nCopy contents of screen5 to screen7 (display file + attributes)."
+        "doc": "SUB CopyScreen5ToScreen7()\n\nCopy contents of screen5 to screen7 (display file + attributes).\nOnly works on 128K and compatible models."
     },
     {
         "name": "CopyScreen7ToScreen5",
         "parameters": "",
-        "doc": "SUB CopyScreen7ToScreen5()\n\nCopy contents of screen7 to screen5 (display file + attributes)."
+        "doc": "SUB CopyScreen7ToScreen5()\n\nCopy contents of screen7 to screen5 (display file + attributes).\nOnly works on 128K and compatible models."
     },
     {
         "name": "SetDrawingScreen5",
         "parameters": "",
-        "doc": "SUB FASTCALL SetDrawingScreen5()\n\nSet drawing buffers to screen5 addresses."
+        "doc": "SUB FASTCALL SetDrawingScreen5()\n\nSet ScreenBufferAddr and AttrBufferAddr to screen5 ($4000/$5800).\nOnly works on 128K and compatible models."
     },
     {
         "name": "SetDrawingScreen7",
         "parameters": "",
         "returnType": "UByte",
-        "doc": "FUNCTION FASTCALL SetDrawingScreen7() AS UByte\n\nSet drawing buffers to screen7 and return previous bank at $c000."
+        "doc": "FUNCTION FASTCALL SetDrawingScreen7() AS UByte\n\nPut screen7 at $c000 (if not already there) and set ScreenBufferAddr and AttrBufferAddr to screen7 ($c000/$d800).\nOnly works on 128K and compatible models.\n\nReturns:\n    UByte: bank that was at $c000 before (to restore it manually if needed)"
     },
     {
         "name": "ToggleDrawingScreen",
         "parameters": "",
-        "doc": "SUB FASTCALL ToggleDrawingScreen()\n\nToggle drawing buffers between screen5 and screen7."
+        "doc": "SUB FASTCALL ToggleDrawingScreen()\n\nToggle ScreenBufferAddr and AttrBufferAddr between screen5 ($4000/$5800) and screen7 ($c000/$d800).\nOnly works on 128K and compatible models."
     },
     {
         "name": "ChangeMaskedSpritesBackgroundSet",
         "parameters": "",
         "returnType": "Byte",
-        "doc": "FUNCTION FASTCALL ChangeMaskedSpritesBackgroundSet() AS Byte\n\nToggle background set and return new set index."
+        "doc": "FUNCTION FASTCALL ChangeMaskedSpritesBackgroundSet() AS Byte\n\nToggle MaskedSpritesBackgroundSet between 0 and 1.\n\nReturns:\n    Byte: new value of MaskedSpritesBackgroundSet"
     },
     {
         "name": "SaveBackgroundAndDrawSprite",
-        "parameters": "X as UByte, Y as UByte, backgroundDir as UInteger, spriteImageDir as UInteger",
-        "doc": "SUB FASTCALL SaveBackgroundAndDrawSprite(X, Y, backgroundDir, spriteImageDir)\n\nSave background at given Dir and draw masked sprite at (X,Y) using provided sprite image directory."
+        "parameters": "X AS UByte, Y AS UByte, backgroundDir AS UInteger, spriteImageDir AS UInteger",
+        "doc": "SUB FASTCALL SaveBackgroundAndDrawSprite(X AS UByte, Y AS UByte, backgroundDir AS UInteger, spriteImageDir AS UInteger)\n\nSave background behind sprite and draw masked (AND+OR) sprite in screen.\n\nParameters:\n    X (UByte):            X coordinate (0:left to 240:right)\n    Y (UByte):            Y coordinate (0:up to 176:down)\n    backgroundDir (UInteger): address where background will be saved\n    spriteImageDir (UInteger): address where sprite image data begins"
     },
     {
         "name": "RestoreBackground",
-        "parameters": "X as UByte, Y as UByte, backgroundDir as UInteger",
-        "doc": "SUB FASTCALL RestoreBackground(X, Y, backgroundDir)\n\nRestore previously saved background at (X,Y) from given directory."
+        "parameters": "X AS UByte, Y AS UByte, backgroundDir AS UInteger",
+        "doc": "SUB FASTCALL RestoreBackground(X AS UByte, Y AS UByte, backgroundDir AS UInteger)\n\nRestore a previously saved background in screen.\n\nParameters:\n    X (UByte):            X coordinate (0:left to 240:right)\n    Y (UByte):            Y coordinate (0:up to 176:down)\n    backgroundDir (UInteger): address where saved background begins"
     }
 ]
+

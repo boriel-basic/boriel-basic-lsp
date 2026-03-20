@@ -1,0 +1,98 @@
+[
+    {
+        "name": "ESXDosOpen",
+        "parameters": "fname As String, mode As UByte",
+        "returnType": "Byte",
+        "doc": "Function ESXDosOpen(fname As String, mode As UByte) As Byte\n\nOpen a file on ESXDOS (SD card).\n\nParameters:\n    fname: filename to open\n    mode: combination of FMODE flags:\n        EDOS_FMODE_READ       (0x1) read access\n        EDOS_FMODE_WRITE      (0x2) write access\n        EDOS_FMODE_OPEN_EX   open if exists, else error\n        EDOS_FMODE_OPEN_AL   open if exists, create if not\n        EDOS_FMODE_CREATE_NEW create if not exists, else error\n        EDOS_FMODE_CREATE_AL  create if not exists, else open and truncate\n\nReturns:\n    File stream ID (Byte). Returns -1 on error; ESXDOS error code is stored in ERR_NR (23610)."
+    },
+    {
+        "name": "ESXDosClose",
+        "parameters": "handle As Byte",
+        "doc": "Sub FASTCALL ESXDosClose(handle As Byte)\n\nClose a file stream previously opened with ESXDosOpen.\n\nParameters:\n    handle: file stream ID to close"
+    },
+    {
+        "name": "ESXDosRead",
+        "parameters": "handle As Byte, buffer As UInteger, nbytes As UInteger",
+        "returnType": "UInteger",
+        "doc": "Function FASTCALL ESXDosRead(handle As Byte, buffer As UInteger, nbytes As UInteger) As UInteger\n\nRead bytes from an open file into a memory buffer.\n\nParameters:\n    handle: file handle returned by ESXDosOpen\n    buffer: memory address of the destination buffer\n    nbytes: number of bytes to read\n\nReturns:\n    Number of bytes effectively read. Returns -1 on error."
+    },
+    {
+        "name": "ESXDosWrite",
+        "parameters": "handle As Byte, buffer As UInteger, nbytes As UInteger",
+        "returnType": "UInteger",
+        "doc": "Function FASTCALL ESXDosWrite(handle As Byte, buffer As UInteger, nbytes As UInteger) As UInteger\n\nWrite bytes from a memory buffer to an open file.\n\nParameters:\n    handle: file handle returned by ESXDosOpen\n    buffer: memory address of the source buffer\n    nbytes: number of bytes to write\n\nReturns:\n    Number of bytes effectively written. Returns -1 on error."
+    },
+    {
+        "name": "ESXDosSeek",
+        "parameters": "handle As Byte, offset As Long, position As UByte",
+        "doc": "Sub FASTCALL ESXDosSeek(handle As Byte, offset As Long, position As UByte)\n\nMove the file pointer to a new position.\n\nParameters:\n    handle: file handle returned by ESXDosOpen\n    offset: byte offset\n    position: reference point for the offset:\n        SEEK_START  (0) from the beginning of the file\n        SEEK_CUR    (1) from the current position (forward)\n        SEEK_BKCUR  (2) from the current position (backward)"
+    },
+    {
+        "name": "ESXDosGetPos",
+        "parameters": "handle As Byte",
+        "returnType": "Long",
+        "doc": "Function FASTCALL ESXDosGetPos(handle As Byte) As Long\n\nGet the current file pointer position.\n\nParameters:\n    handle: file handle returned by ESXDosOpen\n\nReturns:\n    Current file position as a Long."
+    },
+    {
+        "name": "ESXDosGetCwd",
+        "parameters": "",
+        "returnType": "String",
+        "doc": "Function ESXDosGetCwd() As String\n\nGet the current working directory path.\n\nReturns:\n    Current working directory name as a String.\n\nRemarks:\n    Uses a portion of the heap to build the string; the memory is freed before returning."
+    },
+    {
+        "name": "ESXDosOpenDir",
+        "parameters": "path As String",
+        "returnType": "UInteger",
+        "doc": "Function ESXDosOpenDir(path As String) As UInteger\n\nOpen a directory for reading its entries.\n\nParameters:\n    path: directory path to open\n\nReturns:\n    Handle (UInteger) to the opened directory, or 0 on error.\n\nRemarks:\n    Allocates a memory buffer from the heap. Call ESXDosCloseDir to free it."
+    },
+    {
+        "name": "ESXDosCloseDir",
+        "parameters": "handle As UInteger",
+        "doc": "Sub ESXDosCloseDir(handle As UInteger)\n\nClose a directory handle and release its memory buffer.\n\nParameters:\n    handle: UInteger returned by ESXDosOpenDir"
+    },
+    {
+        "name": "ESXDosReadDentry",
+        "parameters": "handle As UInteger",
+        "returnType": "Byte",
+        "doc": "Function FASTCALL ESXDosReadDentry(handle As UInteger) As Byte\n\nRead the next directory entry into the handle's internal buffer.\n\nParameters:\n    handle: UInteger returned by ESXDosOpenDir\n\nReturns:\n    0 if there are no more entries in the directory, non-zero if a new entry was retrieved."
+    },
+    {
+        "name": "ESXDosGetDentryFilename",
+        "parameters": "handle As UInteger",
+        "returnType": "String",
+        "doc": "Function ESXDosGetDentryFilename(handle As UInteger) As String\n\nGet the filename of the last directory entry read by ESXDosReadDentry.\n\nParameters:\n    handle: UInteger returned by ESXDosOpenDir\n\nReturns:\n    String containing the filename of the directory entry."
+    },
+    {
+        "name": "ESXDosGetDentryAttr",
+        "parameters": "handle As UInteger",
+        "returnType": "UByte",
+        "doc": "Function ESXDosGetDentryAttr(handle As UInteger) As UByte\n\nGet the file attributes of the last directory entry read by ESXDosReadDentry.\n\nParameters:\n    handle: UInteger returned by ESXDosOpenDir\n\nReturns:\n    UByte with attribute flags:\n        FATTR_RDONLY  (1)  read-only\n        FATTR_HIDDEN  (2)  hidden\n        FATTR_SYSTEM  (4)  system\n        FATTR_VOLUME  (8)  volume label\n        FATTR_DIR    (16)  directory\n        FATTR_ARCHIVE (32) archive"
+    },
+    {
+        "name": "ESXDosGetDentryFilesize",
+        "parameters": "handle As UInteger",
+        "returnType": "ULong",
+        "doc": "Function FASTCALL ESXDosGetDentryFilesize(handle As UInteger) As ULong\n\nGet the file size of the last directory entry read by ESXDosReadDentry.\n\nParameters:\n    handle: UInteger returned by ESXDosOpenDir\n\nReturns:\n    File size as a ULong."
+    },
+    {
+        "name": "ESXDosChDir",
+        "parameters": "path As String",
+        "doc": "Sub ESXDosChDir(path As String)\n\nChange the current working directory.\n\nParameters:\n    path: directory path to change to"
+    },
+    {
+        "name": "ESXDosTellDir",
+        "parameters": "handle As UInteger",
+        "returnType": "ULong",
+        "doc": "Function FASTCALL ESXDosTellDir(handle As UInteger) As ULong\n\nReturn the index of the next directory entry to be retrieved by ESXDosReadDentry.\n\nParameters:\n    handle: UInteger returned by ESXDosOpenDir\n\nReturns:\n    Directory entry index as a ULong."
+    },
+    {
+        "name": "ESXDosSeekDir",
+        "parameters": "handle As UInteger, entry As ULong",
+        "doc": "Sub FASTCALL ESXDosSeekDir(handle As UInteger, entry As ULong)\n\nSeek to a specific directory entry index.\n\nParameters:\n    handle: UInteger returned by ESXDosOpenDir\n    entry: ULong directory entry index to seek to"
+    },
+    {
+        "name": "ESXDosRewindDir",
+        "parameters": "handle As UInteger",
+        "doc": "Sub FASTCALL ESXDosRewindDir(handle As UInteger)\n\nRewind the directory to the first entry. Equivalent to ESXDosSeekDir(handle, 0).\n\nParameters:\n    handle: UInteger returned by ESXDosOpenDir"
+    }
+]
