@@ -1,6 +1,6 @@
 {
   "name": "boriel-basic-lsp",
-  "version": "1.0.86",
+  "version": "1.0.87",
   "description": "Boriel Basic Language Server Protocol (LSP) implementation for enhanced development",
   "author": "Raül Torralba (Juntelart)",
   "license": "MIT",
@@ -14,6 +14,9 @@
   "homepage": "https://github.com/boriel-basic/boriel-basic-lsp#readme",
   "main": "main.js",
   "bin": "./main.js",
+  "scripts": {
+    "test": "node tests/analyzer.test.js"
+  },
   "dependencies": {
     "chokidar": "^4.0.3",
     "glob": "^11.0.1",

@@ -147,6 +147,18 @@ function stripComments(line) {
  * @param {string} uri - URI del archivo.
  */
 function analyzeFileForDefinitions(filePath, uri) {
+    // Limpiar definiciones antiguas de este archivo para evitar entradas obsoletas
+    globalDefinitions.forEach((value, key) => {
+        if (value.uri === uri) {
+            globalDefinitions.delete(key);
+        }
+    });
+    globalVariables.forEach((value, key) => {
+        if (value.location && value.location.uri === uri) {
+            globalVariables.delete(key);
+        }
+    });
+
     const text = fs.readFileSync(filePath, 'utf8');
     const lines = text.split(/\r?\n/);
 
@@ -256,6 +268,16 @@ function analyzeFileForDefinitions(filePath, uri) {
  * @param {string} uri - URI del archivo.
  */
 function analyzeFileForReferences(filePath, uri) {
+    // Limpiar referencias existentes de este archivo para evitar duplicados al re-analizar
+    globalReferences.forEach((locations, name) => {
+        const filtered = locations.filter(loc => loc.uri !== uri);
+        if (filtered.length === 0) {
+            globalReferences.delete(name);
+        } else {
+            globalReferences.set(name, filtered);
+        }
+    });
+
     const text = fs.readFileSync(filePath, 'utf8');
     const lines = text.split(/\r?\n/);
 
@@ -266,6 +288,11 @@ function analyzeFileForReferences(filePath, uri) {
 
         // Ignorar líneas vacías
         if (trimmedLine === '') {
+            return;
+        }
+
+        // Ignorar líneas de definición (SUB/FUNCTION): no son referencias
+        if (/^\s*(SUB|FUNCTION)\s+(?:FASTCALL\s+)?[a-zA-Z_][a-zA-Z0-9_]*/i.test(trimmedLine)) {
             return;
         }
 
@@ -280,8 +307,12 @@ function analyzeFileForReferences(filePath, uri) {
                 if (!globalReferences.has(name)) {
                     globalReferences.set(name, []);
                 }
+                // Usar la posición exacta del identificador en la línea original
+                const nameMatch = new RegExp(`\\b${name}\\b`, 'i').exec(line);
+                const startChar = nameMatch ? nameMatch.index : 0;
+                const endChar = startChar + name.length;
                 console.log(`Referencia encontrada: ${name} en ${filePath}, línea ${i + 1}`);
-                globalReferences.get(name).push(Location.create(uri, Range.create(i, 0, i, trimmedLine.length)));
+                globalReferences.get(name).push(Location.create(uri, Range.create(i, startChar, i, endChar)));
             }
         });
     });
