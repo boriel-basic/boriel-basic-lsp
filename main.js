@@ -10,6 +10,7 @@ const {
 const { TextDocument } = require('vscode-languageserver-textdocument');
 const { URI } = require('vscode-uri');
 const path = require('path');
+const fs = require('fs');
 const packageJson = require('./package.json');
 
 const projectPath = process.argv[2];
@@ -32,6 +33,8 @@ const {
     analyzeProjectFiles,
     analyzeFileForDefinitions,
     analyzeFileForReferences,
+    analyzeTextForDefinitions,
+    analyzeTextForReferences,
     stripComments,
 } = require('./analyzer');
 
@@ -101,6 +104,171 @@ connection.onDefinition((params) => {
 
     console.log(`No se encontró definición para: ${wordAtPosition}`);
     return null;
+});
+
+// Manejar solicitud de refactor/rename
+connection.onRenameRequest((params) => {
+    try {
+        const document = documents.get(params.textDocument.uri);
+        if (!document) return null;
+
+        const position = params.position;
+        const lineText = document.getText({
+            start: { line: position.line, character: 0 },
+            end: { line: position.line, character: Number.MAX_SAFE_INTEGER }
+        });
+
+        const strippedLine = stripComments(lineText);
+        if (position.character >= strippedLine.length) return null; // en comentario
+
+        // encontrar palabra en la posición
+        const wordRegex = /[a-zA-Z_][a-zA-Z0-9_]*/g;
+        let match, wordAtPosition = null;
+        while ((match = wordRegex.exec(lineText)) !== null) {
+            const startIndex = match.index;
+            const endIndex = startIndex + match[0].length;
+            if (position.character >= startIndex && position.character <= endIndex) {
+                wordAtPosition = match[0];
+                break;
+            }
+        }
+        if (!wordAtPosition) return null;
+
+        const oldName = wordAtPosition;
+        const newName = params.newName && params.newName.trim();
+        if (!newName || newName === oldName) return null;
+
+        const edits = {};
+
+        // Definición
+        if (globalDefinitions.has(oldName)) {
+            const def = globalDefinitions.get(oldName);
+            if (def && def.uri) {
+                edits[def.uri] = edits[def.uri] || [];
+                let defRange = def.range;
+                try {
+                    if (def.uri.startsWith('file:')) {
+                        const defFs = URI.parse(def.uri).fsPath;
+                        const fileText = fs.readFileSync(defFs, 'utf8');
+                        const defLines = fileText.split(/\r?\n/);
+                        const lineIdx = def.range.start.line;
+                        if (lineIdx >= 0 && lineIdx < defLines.length) {
+                            const headerLine = defLines[lineIdx];
+                            const re = new RegExp(`\\b${oldName}\\b`, 'i');
+                            const m = re.exec(headerLine);
+                            if (m) {
+                                const startChar = m.index;
+                                defRange = Range.create(lineIdx, startChar, lineIdx, startChar + oldName.length);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    connection.console.warn(`No se pudo leer archivo para localizar definición: ${e.message}`);
+                }
+                edits[def.uri].push({ range: defRange, newText: newName });
+            }
+        }
+
+        // Referencias globales
+        if (globalReferences.has(oldName)) {
+            for (const loc of globalReferences.get(oldName)) {
+                edits[loc.uri] = edits[loc.uri] || [];
+                edits[loc.uri].push({ range: loc.range, newText: newName });
+            }
+        }
+
+        // Ocurrencias locales en el documento actual
+        const docText = document.getText();
+        const regex = new RegExp(`\\b${oldName}\\b`, 'g');
+        let m;
+        while ((m = regex.exec(docText)) !== null) {
+            const startOffset = m.index;
+            const startPos = document.positionAt(startOffset);
+            const endPos = document.positionAt(startOffset + oldName.length);
+            const uri = params.textDocument.uri;
+            edits[uri] = edits[uri] || [];
+            edits[uri].push({ range: Range.create(startPos.line, startPos.character, endPos.line, endPos.character), newText: newName });
+        }
+
+        // Actualizar índices en memoria inmediatamente para que el servidor
+        // reconozca la nueva función antes de que el cliente reanalice.
+        if (globalDefinitions.has(oldName)) {
+            try {
+                const def = globalDefinitions.get(oldName);
+                const newDef = Object.assign({}, def, { name: newName });
+                if (newDef.header) {
+                    newDef.header = newDef.header.replace(new RegExp(`\\b${oldName}\\b`, 'g'), newName);
+                }
+                globalDefinitions.delete(oldName);
+                globalDefinitions.set(newName, newDef);
+            } catch (e) {
+                connection.console.warn(`Error actualizando globalDefinitions en memoria: ${e.message}`);
+            }
+        }
+
+        if (globalReferences.has(oldName)) {
+            try {
+                const refs = globalReferences.get(oldName);
+                globalReferences.delete(oldName);
+                globalReferences.set(newName, refs);
+            } catch (e) {
+                connection.console.warn(`Error actualizando globalReferences en memoria: ${e.message}`);
+            }
+        }
+
+        // Filtrar URIs no-file
+        const fileEditsRaw = {};
+        for (const uri of Object.keys(edits)) {
+            if (uri && uri.startsWith('file:')) fileEditsRaw[uri] = edits[uri];
+        }
+        if (Object.keys(fileEditsRaw).length === 0) return null;
+
+        // Normalizar/deduplicar y ordenar de final a inicio
+        const fileEdits = {};
+        for (const uri of Object.keys(fileEditsRaw)) {
+            const seen = new Set();
+            const arr = [];
+            for (const e of fileEditsRaw[uri]) {
+                if (!e || !e.range) continue;
+                const key = `${e.range.start.line}:${e.range.start.character}-${e.range.end.line}:${e.range.end.character}:${e.newText}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                arr.push(e);
+            }
+            arr.sort((a, b) => {
+                if (a.range.start.line !== b.range.start.line) return b.range.start.line - a.range.start.line;
+                return b.range.start.character - a.range.start.character;
+            });
+            fileEdits[uri] = arr;
+        }
+
+        return { changes: fileEdits };
+    } catch (err) {
+        connection.console.error(`Error en onRenameRequest: ${err && err.message}`);
+        return null;
+    }
+});
+
+// Reanalizar ficheros afectados de forma asíncrona después de devolver el WorkspaceEdit
+// (se usa setImmediate para no bloquear la respuesta al cliente)
+setImmediate(() => {
+    try {
+        // Recolectar URIs afectadas a partir de la última llamada (se reconstruyen desde el índice global si es necesario)
+        // Nota: esta función se ejecuta justo después del handler, por lo que `fileEdits` no está en este scope.
+        // En su lugar, reanalizamos todos los ficheros abiertos para mantener los índices consistentes.
+        for (const [uri, doc] of documents.entries()) {
+            try {
+                const text = doc.getText();
+                analyzeTextForDefinitions(text, uri);
+                analyzeTextForReferences(text, uri);
+                connection.console.info(`Reanalizado (memoria) tras rename: ${uri}`);
+            } catch (e) {
+                connection.console.warn(`Error reanalizando (memoria) ${uri}: ${e.message}`);
+            }
+        }
+    } catch (e) {
+        connection.console.warn(`Error en reanálisis global tras rename: ${e.message}`);
+    }
 });
 
 // Manejar solicitud de referencias

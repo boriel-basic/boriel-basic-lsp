@@ -263,6 +263,101 @@ function analyzeFileForDefinitions(filePath, uri) {
 }
 
 /**
+ * Analiza el contenido de un archivo provisto como texto para encontrar definiciones.
+ * Útil cuando el documento está abierto en memoria en lugar de leerlo desde disco.
+ */
+function analyzeTextForDefinitions(text, uri) {
+    // Limpiar definiciones antiguas de este archivo para evitar entradas obsoletas
+    globalDefinitions.forEach((value, key) => {
+        if (value.uri === uri) {
+            globalDefinitions.delete(key);
+        }
+    });
+    globalVariables.forEach((value, key) => {
+        if (value.location && value.location.uri === uri) {
+            globalVariables.delete(key);
+        }
+    });
+
+    const lines = text.split(/\r?\n/);
+
+    lines.forEach((line, i) => {
+        const codeLine = stripComments(line);
+        const trimmedLine = codeLine.trim();
+        if (trimmedLine === '') return;
+
+        const definitionMatch = /^\s*(SUB|FUNCTION)\s+(?:FASTCALL\s+)?([a-zA-Z_][a-zA-Z0-9_]*)\s*\(([^)]*)\)?\s*(?:AS\s+(\w+))?/i.exec(trimmedLine);
+        if (definitionMatch) {
+            const type = definitionMatch[1].toUpperCase();
+            const name = definitionMatch[2];
+            const parameters = definitionMatch[3];
+            const returnType = definitionMatch[4] || 'void';
+            const header = trimmedLine;
+
+            globalDefinitions.set(name, {
+                uri,
+                range: {
+                    start: { line: i, character: 0 },
+                    end: { line: i, character: line.length }
+                },
+                type,
+                name,
+                parameters,
+                returnType,
+                header,
+            });
+        }
+
+        // Variables, constantes, macros (mismo comportamiento que analyzeFileForDefinitions)
+        const variableMatch = /^\s*DIM\s+([a-zA-Z_][a-zA-Z0-9_]*)(\([^\)]*\))?\s*(?:AS\s+(\w+))?(?:\s*=\s*(.+))?/i.exec(trimmedLine);
+        if (variableMatch) {
+            const name = variableMatch[1];
+            const dimensions = variableMatch[2] || null;
+            const type = variableMatch[3] || 'unknown';
+            const value = variableMatch[4] || null;
+
+            let parsedDimensions = null;
+            if (dimensions) {
+                parsedDimensions = dimensions.replace(/[()]/g, '').split(',').map(dim => dim.trim());
+            }
+
+            globalVariables.set(name, {
+                location: Location.create(uri, Range.create(i, 0, i, trimmedLine.length)),
+                type,
+                value,
+                dimensions: parsedDimensions
+            });
+        }
+
+        const constantMatch = /^\s*CONST\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:AS\s+(\w+))?\s*=\s*(.+)/i.exec(trimmedLine);
+        if (constantMatch) {
+            const name = constantMatch[1];
+            const type = constantMatch[2] || 'unknown';
+            const value = constantMatch[3];
+
+            globalVariables.set(name, {
+                location: Location.create(uri, Range.create(i, 0, i, trimmedLine.length)),
+                type: 'constant',
+                value,
+                dataType: type
+            });
+        }
+
+        const macroMatch = /^\s*#DEFINE\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(.+)?/i.exec(trimmedLine);
+        if (macroMatch) {
+            const name = macroMatch[1];
+            const value = macroMatch[2] || '';
+
+            globalVariables.set(name, {
+                location: Location.create(uri, Range.create(i, 0, i, trimmedLine.length)),
+                type: 'macro',
+                value
+            });
+        }
+    });
+}
+
+/**
  * Analiza un archivo para encontrar referencias a funciones y subrutinas.
  * @param {string} filePath - Ruta del archivo.
  * @param {string} uri - URI del archivo.
@@ -318,10 +413,55 @@ function analyzeFileForReferences(filePath, uri) {
     });
 }
 
+/**
+ * Analiza referencias a partir de un texto en memoria.
+ */
+function analyzeTextForReferences(text, uri) {
+    // Limpiar referencias existentes de este archivo para evitar duplicados al re-analizar
+    globalReferences.forEach((locations, name) => {
+        const filtered = locations.filter(loc => loc.uri !== uri);
+        if (filtered.length === 0) {
+            globalReferences.delete(name);
+        } else {
+            globalReferences.set(name, filtered);
+        }
+    });
+
+    const lines = text.split(/\r?\n/);
+
+    lines.forEach((line, i) => {
+        const codeLine = stripComments(line);
+        const trimmedLine = codeLine.trim();
+        if (trimmedLine === '') return;
+
+        // Ignorar líneas de definición (SUB/FUNCTION): no son referencias
+        if (/^\s*(SUB|FUNCTION)\s+(?:FASTCALL\s+)?[a-zA-Z_][a-zA-Z0-9_]*/i.test(trimmedLine)) {
+            return;
+        }
+
+        globalDefinitions.forEach((_, name) => {
+            const callPattern = new RegExp(`\\b${name}\\s*\\(`, 'i');
+            const subPattern = new RegExp(`\\b${name}\\b(?!\\s*\\()`, 'i');
+
+            if (callPattern.test(trimmedLine) || subPattern.test(trimmedLine)) {
+                if (!globalReferences.has(name)) {
+                    globalReferences.set(name, []);
+                }
+                const nameMatch = new RegExp(`\\b${name}\\b`, 'i').exec(line);
+                const startChar = nameMatch ? nameMatch.index : 0;
+                const endChar = startChar + name.length;
+                globalReferences.get(name).push(Location.create(uri, Range.create(i, startChar, i, endChar)));
+            }
+        });
+    });
+}
+
 module.exports = {
     analyzeProjectFiles,
     analyzeFileForDefinitions,
     analyzeFileForReferences,
+    analyzeTextForDefinitions,
+    analyzeTextForReferences,
     globalDefinitions,
     globalReferences,
     globalVariables,
