@@ -674,7 +674,57 @@ connection.onCodeAction((params) => {
         return p;
     });
     const paramsSignature = paramSigs.length ? `(${paramSigs.join(', ')})` : '()';
-    const funcText = `\nSUB ${funcName}${paramsSignature}\n${indented}\nEND SUB\n`;
+
+    // Detectar si la selección es la RHS de una asignación en la misma línea
+    const selStartChar = range.start.character;
+    const beforeSel = startLineText.slice(0, selStartChar);
+    const eqIndex = beforeSel.lastIndexOf('=');
+    let isAssignment = false;
+    let assignedVar = null;
+    if (eqIndex !== -1) {
+        const afterEq = beforeSel.slice(eqIndex + 1);
+        if (/^\s*$/.test(afterEq)) {
+            const lhs = beforeSel.slice(0, eqIndex).trim();
+            const m = /([A-Za-z_][A-Za-z0-9_]*)\s*$/.exec(lhs);
+            if (m) {
+                isAssignment = true;
+                assignedVar = m[1];
+            }
+        }
+    }
+
+    // Inferir tipo de retorno si es posible
+    let returnType = null;
+    if (assignedVar && globalVariables.has(assignedVar)) {
+        const entry = globalVariables.get(assignedVar);
+        returnType = entry.dataType || entry.type || null;
+    }
+
+    // Construir el texto de la función/subrutina con estilo (palabras clave con mayúscula inicial)
+    let funcHeader = '';
+    let funcFooter = '';
+    let body = '';
+    const isMultiLine = selectedText.includes('\n');
+    if (isAssignment) {
+        // Generar Function (usar Return para Boriel Basic)
+        funcHeader = `\nFunction ${funcName}${paramsSignature}` + (returnType ? ` As ${returnType}` : '') + `\n`;
+        if (!isMultiLine) {
+            // selección simple: devolver expresión usando Return
+            body = `    Return ${selectedText.trim()}\n`;
+        } else {
+            body = indented + '\n';
+            // Añadir retorno por defecto si no se asigna dentro
+            body += `    ' TODO: asignar valor de retorno\n    Return 0\n`;
+        }
+        funcFooter = `End Function\n`;
+    } else {
+        // Generar Sub
+        funcHeader = `\nSub ${funcName}${paramsSignature}\n`;
+        body = indented + '\n';
+        funcFooter = `End Sub\n`;
+    }
+
+    const funcText = funcHeader + body + funcFooter;
 
     // Construir ediciones: insertar al final del documento y reemplazar selección por llamada
     const uri = params.textDocument.uri;
@@ -919,17 +969,28 @@ connection.languages.semanticTokens.on((params) => {
     return { data };
 });
 
+
+
 // Función para obtener el tipo de token
 function getTokenType(type) {
+    // Map semantic categories to the indices defined in the provider legend:
+    // legend: ['keyword', 'function', 'variable', 'string', 'number', 'comment']
     switch (type) {
-        case 'logic': return 0; // 'keyword'
-        case 'control': return 3; // 'control'
-        case 'type': return 4; // 'type'
-        case 'definition': return 5; // 'definition'
-        case 'io': return 6; // 'io'
         case 'function': return 1; // 'function'
-        case 'keyword': return 0; // 'keyword'
-        default: return 0; // Default to 'keyword'
+        case 'variable': return 2; // 'variable'
+        case 'string': return 3; // 'string'
+        case 'number': return 4; // 'number'
+        case 'comment': return 5; // 'comment'
+
+        // Treat these categories as keywords for highlighting purposes
+        case 'logic':
+        case 'control':
+        case 'keyword':
+        case 'definition':
+        case 'io':
+        case 'type':
+        default:
+            return 0; // 'keyword'
     }
 }
 
