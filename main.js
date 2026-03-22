@@ -6,6 +6,7 @@ const {
     TextDocuments,
     TextDocumentSyncKind,
     CompletionItemKind,
+    CodeActionKind,
 } = require('vscode-languageserver/node');
 const { TextDocument } = require('vscode-languageserver-textdocument');
 const { URI } = require('vscode-uri');
@@ -23,6 +24,9 @@ console.log(`[LSP] Boriel Basic LSP server started - Version ${packageJson.versi
 // Manejo de documentos abiertos
 const documents = new TextDocuments(TextDocument);
 documents.listen(connection);
+
+// Contador para nombres de funciones extraídas
+let _extractCounter = 1;
 
 const { borielBasicKeywords } = require('./const');
 const { formatBorielBasicCode } = require('./formatter');
@@ -573,6 +577,129 @@ connection.onSignatureHelp((params) => {
         activeSignature: 0,
         activeParameter: Math.max(0, params.context?.triggerCharacter === ',' ? parameters.length - 1 : 0)
     };
+});
+
+// Proponer CodeAction para Extract Method
+connection.onCodeAction((params) => {
+    const doc = documents.get(params.textDocument.uri);
+    if (!doc) return [];
+
+    const range = params.range;
+    const startOffset = doc.offsetAt(range.start);
+    const endOffset = doc.offsetAt(range.end);
+    if (endOffset <= startOffset) return [];
+
+    const selectedText = doc.getText(range);
+    if (!selectedText || !selectedText.trim()) return [];
+
+    // Evitar extract dentro de comentarios (básico: comprobar la línea start)
+    const startLineText = doc.getText({ start: { line: range.start.line, character: 0 }, end: { line: range.start.line, character: Number.MAX_SAFE_INTEGER } });
+    if (stripComments(startLineText).trim().length <= 0) return [];
+
+    // Generar nombre único
+    const funcName = `extracted_${_extractCounter++}`;
+
+    // Detectar identificadores usados en la selección, ignorando texto entre comillas
+    const usedIdsOrdered = [];
+    const usedIdsSet = new Set();
+    (function collectIdsOutsideStrings(text) {
+        let inString = false;
+        for (let i = 0; i < text.length; i++) {
+            const ch = text[i];
+            if (ch === '"') {
+                // handle doubled quotes "" inside strings
+                if (inString && text[i + 1] === '"') {
+                    i++; // skip escaped quote
+                    continue;
+                }
+                inString = !inString;
+                continue;
+            }
+            if (inString) continue;
+
+            // identifier start
+            if (/[A-Za-z_]/.test(ch)) {
+                let j = i + 1;
+                while (j < text.length && /[A-Za-z0-9_]/.test(text[j])) j++;
+                const id = text.slice(i, j);
+                if (!usedIdsSet.has(id)) {
+                    usedIdsSet.add(id);
+                    usedIdsOrdered.push(id);
+                }
+                i = j - 1;
+            }
+        }
+    })(selectedText);
+
+    // Excluir palabras reservadas y builtins
+    const keywordSet = new Set(borielBasicKeywords.map(k => k.label.toUpperCase()));
+    const builtinsSet = new Set(Array.from(globalDefinitions.keys()).map(k => k.toUpperCase()));
+
+    // Detectar identificadores declarados dentro de la selección (DIM, CONST, asignaciones simples)
+    const declaredInside = new Set();
+    const dimRegex = /\bDIM\s+([A-Za-z_][A-Za-z0-9_]*)/ig;
+    let im2;
+    while ((im2 = dimRegex.exec(selectedText)) !== null) declaredInside.add(im2[1]);
+    const constRegex = /\bCONST\s+([A-Za-z_][A-Za-z0-9_]*)/ig;
+    while ((im2 = constRegex.exec(selectedText)) !== null) declaredInside.add(im2[1]);
+    const assignRegex = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=/mg;
+    while ((im2 = assignRegex.exec(selectedText)) !== null) declaredInside.add(im2[1]);
+
+    // Construir lista de parámetros: usados pero no declarados dentro y no keywords/builtins
+    const paramsList = [];
+    for (const id of usedIdsOrdered) {
+        const up = id.toUpperCase();
+        if (declaredInside.has(id)) continue;
+        if (keywordSet.has(up)) continue;
+        if (builtinsSet.has(up)) continue;
+        if (/^\d+$/.test(id)) continue;
+        // evitar que 'Print' u otras palabras de linea inicial sean pasadas
+        paramsList.push(id);
+    }
+
+    // Formatear el bloque de función con indentación de 4 espacios
+    const selLines = selectedText.split(/\r?\n/);
+    // eliminar líneas iniciales/finales vacías
+    while (selLines.length && selLines[0].trim() === '') selLines.shift();
+    while (selLines.length && selLines[selLines.length - 1].trim() === '') selLines.pop();
+    const indented = selLines.map(l => (l.trim() === '' ? '' : '    ' + l)).join('\n');
+
+    // Construir firma con tipos cuando estén disponibles en globalVariables
+    const paramSigs = paramsList.map(p => {
+        const entry = globalVariables.get(p);
+        if (entry) {
+            const t = entry.dataType || entry.type || null;
+            if (t && t !== 'unknown') return `${p} As ${t}`;
+        }
+        return p;
+    });
+    const paramsSignature = paramSigs.length ? `(${paramSigs.join(', ')})` : '()';
+    const funcText = `\nSUB ${funcName}${paramsSignature}\n${indented}\nEND SUB\n`;
+
+    // Construir ediciones: insertar al final del documento y reemplazar selección por llamada
+    const uri = params.textDocument.uri;
+    const edits = {};
+    const docText = doc.getText();
+    const docEndPos = doc.positionAt(docText.length);
+    edits[uri] = [];
+
+    // Insertar la nueva función al final
+    edits[uri].push({ range: Range.create(docEndPos.line, docEndPos.character, docEndPos.line, docEndPos.character), newText: funcText });
+
+    // Reemplazar selección por la llamada a la función, pasando parámetros en orden deducido
+    const callText = `${funcName}${paramsList.length ? '(' + paramsList.join(', ') + ')' : '()'}`;
+    edits[uri].push({ range: range, newText: callText });
+
+    const workspaceEdit = { changes: {} };
+    workspaceEdit.changes[uri] = edits[uri];
+
+    const action = {
+        title: 'Extract Method',
+        kind: CodeActionKind.RefactorExtract,
+        edit: workspaceEdit
+    };
+
+    return [action];
 });
 
 connection.languages.semanticTokens.on((params) => {
