@@ -87,4 +87,11 @@
         "returnType": "ubyte",
         "doc": "\nfunction isletter(ByVal s$)\n\nReturns not 0 if the first element of s$ is a letter,\nor 0 otherwise.\nFor example:\nisletter(\"0\") returns 0, isletter(\"a\") returns 1\n"
     }
+    ,
+    {
+        "name": "str",
+        "parameters": "ByVal n as Number",
+        "returnType": "String",
+        "doc": "\nfunction Str(<numeric value>)\n\nConverts the given numeric value to a String. It's the opposite of VAL. Returned value type is String.\n"
+    }
 ]

@@ -1,6 +1,6 @@
 {
   "name": "boriel-basic-lsp",
-  "version": "1.0.90",
+  "version": "1.0.91",
   "description": "Boriel Basic Language Server Protocol (LSP) implementation for enhanced development",
   "author": "Raül Torralba (Juntelart)",
   "license": "MIT",
