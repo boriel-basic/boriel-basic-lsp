@@ -355,8 +355,19 @@ connection.onHover((params) => {
     }
 
     // Priorizar definiciones globales (incluye builtins)
-    if (globalDefinitions.has(wordAtPosition)) {
-        const def = globalDefinitions.get(wordAtPosition);
+    // Buscar definición case-insensitive como fallback para evitar caer en keywords
+    let defKey = wordAtPosition;
+    if (!globalDefinitions.has(defKey)) {
+        for (const k of globalDefinitions.keys()) {
+            if (k.toLowerCase() === wordAtPosition.toLowerCase()) {
+                defKey = k;
+                break;
+            }
+        }
+    }
+
+    if (globalDefinitions.has(defKey)) {
+        const def = globalDefinitions.get(defKey);
         const docText = def.doc || '';
 
         let codeSignature = '';
