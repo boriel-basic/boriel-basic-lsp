@@ -664,8 +664,6 @@ connection.onCodeAction((params) => {
     while ((im2 = dimRegex.exec(selectedText)) !== null) declaredInside.add(im2[1]);
     const constRegex = /\bCONST\s+([A-Za-z_][A-Za-z0-9_]*)/ig;
     while ((im2 = constRegex.exec(selectedText)) !== null) declaredInside.add(im2[1]);
-    const assignRegex = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=/mg;
-    while ((im2 = assignRegex.exec(selectedText)) !== null) declaredInside.add(im2[1]);
 
     // Construir lista de parámetros: usados pero no declarados dentro y no keywords/builtins
     const paramsList = [];
