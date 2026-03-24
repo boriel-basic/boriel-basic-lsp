@@ -290,14 +290,25 @@ connection.onReferences((params) => {
     if (position.character >= strippedLine.length) {
         return []; // Está en un comentario
     }
-    const words = lineText.trim().split(/\s+/).map(word => word.replace(/[^\w]/g, ''));
 
-    console.log(`Palabras detectadas en la línea ${position.line + 1}:`, words);
+    // Extraer la palabra exacta en la posición del cursor
+    let start = position.character;
+    let end = position.character;
+    while (start > 0 && /\w/.test(lineText[start - 1])) start--;
+    while (end < lineText.length && /\w/.test(lineText[end])) end++;
+    const word = lineText.substring(start, end);
 
-    for (const word of words) {
-        if (globalReferences.has(word)) {
-            console.log(`Referencias globales encontradas para: ${word}`);
-            return globalReferences.get(word);
+    console.log(`Palabra detectada en posición ${position.character}:`, word);
+
+    // Búsqueda exacta primero, luego insensible a mayúsculas
+    if (globalReferences.has(word)) {
+        console.log(`Referencias globales encontradas para: ${word}`);
+        return globalReferences.get(word);
+    }
+    for (const [key, refs] of globalReferences) {
+        if (key.toLowerCase() === word.toLowerCase()) {
+            console.log(`Referencias globales encontradas (case-insensitive) para: ${word}`);
+            return refs;
         }
     }
 
