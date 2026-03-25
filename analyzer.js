@@ -33,12 +33,32 @@ builtinDefinitions.forEach(def => {
     });
 });
 
-// Obtener la ruta del proyecto desde los argumentos
-const projectPath = process.argv[2]; // La ruta del proyecto se pasa como argumento al servidor
+// Obtener la ruta del proyecto desde los argumentos o usar el cwd como fallback
+let projectPath = process.argv[2] || process.cwd(); // La ruta del proyecto se pasa como argumento al servidor
 
-if (!projectPath && require.main === module) {
-    console.error('No se proporcionó la ruta del proyecto.');
-    process.exit(1);
+if (!projectPath) {
+    console.warn('No se pudo determinar la ruta del proyecto; usando el directorio actual.');
+}
+
+/**
+ * Permite establecer la ruta del proyecto desde el servidor LSP cuando
+ * el cliente (IDE) conoce la raíz del workspace.
+ * Acepta tanto rutas de sistema de archivos como URIs (`file://`).
+ */
+function setProjectPath(p) {
+    if (!p) return;
+    try {
+        // Si viene como URI, convertir a path
+        if (p.startsWith('file://')) {
+            const { URI } = require('vscode-uri');
+            projectPath = URI.parse(p).fsPath;
+        } else {
+            projectPath = p;
+        }
+        console.log(`analyzer: projectPath establecido a: ${projectPath}`);
+    } catch (e) {
+        console.warn('analyzer: error al establecer projectPath:', e.message);
+    }
 }
 
 // Cargar y procesar el archivo .gitignore
@@ -466,4 +486,5 @@ module.exports = {
     globalReferences,
     globalVariables,
     stripComments,
+    setProjectPath,
 };

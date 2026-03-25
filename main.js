@@ -37,6 +37,7 @@ const {
     analyzeProjectFiles,
     analyzeFileForDefinitions,
     analyzeFileForReferences,
+    setProjectPath,
     analyzeTextForDefinitions,
     analyzeTextForReferences,
     stripComments,
@@ -420,6 +421,17 @@ connection.onInitialize((params) => {
         formatKeywords
     };
 
+    // Establecer la ruta del proyecto para el analizador usando la raíz provista
+    // por el cliente LSP si está disponible (compatibilidad con distintos IDEs).
+    const rootUri = params.rootUri || (params.workspaceFolders && params.workspaceFolders[0] && params.workspaceFolders[0].uri) || params.rootPath;
+    if (rootUri) {
+        try {
+            setProjectPath(rootUri);
+        } catch (e) {
+            console.warn('Error estableciendo projectPath en analyzer:', e.message);
+        }
+    }
+
     analyzeProjectFiles();
 
     return {
@@ -435,6 +447,7 @@ connection.onInitialize((params) => {
             signatureHelpProvider: {
                 triggerCharacters: ['(', ','] // Activar al escribir '(' o ','
             },
+               hoverProvider: true, // Indicar que el hover está soportado
             documentFormattingProvider: true, // Habilitar el formato de documentos
             definitionProvider: true, // Habilitar ir a la definición
             referencesProvider: true,  // Habilitar encontrar referencias
