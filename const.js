@@ -151,6 +151,17 @@ const borielBasicKeywords = [
 
 // Import library function definitions and add them to keywords
 const libraryDefinitions = require('./functionsDefinitions');
+
+// Create a set with the names of the functions defined in the JSON files
+const libraryFunctionNames = new Set(libraryDefinitions.map(def => def.name.toLowerCase()));
+
+// Remove from borielBasicKeywords any function that is already in libraryDefinitions
+for (let i = borielBasicKeywords.length - 1; i >= 0; i--) {
+    if (libraryFunctionNames.has(borielBasicKeywords[i].label.toLowerCase())) {
+        borielBasicKeywords.splice(i, 1);
+    }
+}
+
 libraryDefinitions.forEach(def => {
     borielBasicKeywords.push({
         label: def.name,
